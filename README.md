@@ -7,7 +7,7 @@ SwiftWin.ps1
       [-?]
       [-Verbose]
       [-Reset]
-      [-Phase {0 | 1 | 2 | 3 | 4}]
+      [-Phase {0 | 1 | 2 | 3}]
 ```
 
 ## Description

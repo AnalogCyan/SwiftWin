@@ -1,6 +1,6 @@
 # 🔮 SwiftWin
 
-Swiftly maintain Windows 10 with ease.
+Swiftly maintain Windows 11 with ease.
 
 ```
 SwiftWin.ps1
@@ -83,7 +83,7 @@ I highly advise you have a look at the script for yourself, and modify it to bet
 
 With all that noted, I do plan on adding more friendly controls in the future.
 
-This script was designed and tested on Windows 10 20H2 with PowerShell 7.2.0 and higher. No guarantees as to how well it'll work on other versions of Windows/PowerShell.
+This script was designed and tested on Windows 11 with PowerShell 7. No guarantees as to how well it'll work on other versions of Windows/PowerShell.
 
 ## Links
 

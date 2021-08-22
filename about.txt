@@ -2,13 +2,13 @@ NAME
     SwiftWin.ps1
 
 SYNOPSIS
-    Script for swiftly completing many Windows maintenance tasks.
+    Script for swiftly completing various Windows maintenance tasks.
 
 SYNTAX
-    SwiftWin.ps1 [-?] [-Debug] [-Verbose] [-Reset] [-Phase {0 | 1 | 2 | 3 | 4}]
+    SwiftWin.ps1 [-?] [-Verbose] [-Reset]
 
 DESCRIPTION
-    The `SwiftWin.ps1` script runs through a series of Windows 10 maintenance
+    The `SwiftWin.ps1` script runs through a series of Windows maintenance
     tasks I commonly perform when cleaning up and optimizing a system.
 
 RELATED LINKS

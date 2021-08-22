@@ -1,30 +1,23 @@
 # 🔮 SwiftWin
 
-Swiftly maintain Windows 11 with ease.
+Swiftly maintain Windows with ease.
 
 ```
 SwiftWin.ps1
       [-?]
       [-Verbose]
       [-Reset]
-      [-Phase {0 | 1 | 2 | 3}]
 ```
 
 ## Description
 
-The `SwiftWin.ps1` script runs through a series of Windows 10 maintenance tasks I commonly perform when cleaning up and optimizing a system.
+The `SwiftWin.ps1` script runs through a series of Windows maintenance tasks I commonly perform when cleaning up and optimizing a system.
 
-## Phases
+## Options
 
-The script's execution is split into multiple "phases." Below is a brief description of what each phase entails.
+The script's various functions are split into categories. Each category and its options are listed below.
 
-### Phase 0
-
-### Phase 1
-
-### Phase 2
-
-### Phase 3
+### [WIP]
 
 ## Parameters
 
@@ -50,27 +43,10 @@ Required: False
 
 ### -Reset
 
-Force removal of the script's temporary files. This will delete any files the script has downloaded and reset the scripts current state, preventing it from resuming a previously unfinished run.
+Force removal of the script's temporary files. This will delete any files the script has downloaded and reset the scripts current state.
 
 ```yaml
 Accepted values: None
-Default value: None
-Required: False
-```
-
-### -Phase
-
-Execute only one specific phase of the script. The acceptable values for this parameter are:
-
-- 0
-- 1
-- 2
-- 3
-
-The script will default to running through all phases if none is specified, or attempt to resume at the appropriate phase if previous runs did not conclude in a finished state.
-
-```yaml
-Accepted values: 0, 1, 2, 3
 Default value: None
 Required: False
 ```
@@ -91,6 +67,7 @@ Below is a list of links to any external resources used in this script.
 
 | Program                      | Link                                                                                                                                                         |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| PSWindowsUpdate              | [https://www.powershellgallery.com/packages/PSWindowsUpdate](https://www.powershellgallery.com/packages/PSWindowsUpdate)                                     |
 | WinDlg                       | [http://download.wdc.com/windlg/WinDlg_v1_29.zip](http://download.wdc.com/windlg/WinDlg_v1_29.zip)                                                           |
 | Bleachbit                    | [https://www.bleachbit.org/](https://www.bleachbit.org/)                                                                                                     |
 | Microsoft Safety Scanner     | [https://www.microsoft.com/security/scanner/en-us/default.aspx](https://www.microsoft.com/security/scanner/en-us/default.aspx)                               |

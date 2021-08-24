@@ -43,7 +43,7 @@ Required: False
 
 ### -Reset
 
-Force removal of the script's temporary files. This will delete any files the script has downloaded and reset the scripts current state.
+Force removal of the script's temporary files. This will delete any files the script has downloaded and reset the scripts current state. This will not delete any generated log files.
 
 ```yaml
 Accepted values: None
@@ -67,6 +67,7 @@ Below is a list of links to any external resources used in this script.
 
 | Program                      | Link                                                                                                                                                         |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Chocolatey                   | [https://chocolatey.org/](https://chocolatey.org/)                                                                                                           |
 | PSWindowsUpdate              | [https://www.powershellgallery.com/packages/PSWindowsUpdate](https://www.powershellgallery.com/packages/PSWindowsUpdate)                                     |
 | WinDlg                       | [http://download.wdc.com/windlg/WinDlg_v1_29.zip](http://download.wdc.com/windlg/WinDlg_v1_29.zip)                                                           |
 | Bleachbit                    | [https://www.bleachbit.org/](https://www.bleachbit.org/)                                                                                                     |

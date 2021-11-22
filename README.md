@@ -1,8 +1,10 @@
 # 🔮 SwiftWin
 
+⚠️ This script is a work in progress, some features are unfinished or broken.
+
 Swiftly maintain Windows with ease.
 
-```
+```powershell
 SwiftWin.ps1
       [-?]
       [-Verbose]
@@ -15,9 +17,77 @@ The `SwiftWin.ps1` script runs through a series of Windows maintenance tasks I c
 
 ## Options
 
-The script's various functions are split into categories. Each category and its options are listed below.
+The script's various functions are split into groups. Each group and its options are listed below.
 
-### [WIP]
+### Updates
+
+Performs various software update functions.
+
+#### Chocolatey
+
+Check for and install updates in the Chocolatey package manager.
+
+#### Windows Package Manager
+
+Check for and install updates in the Windows Package Manager.
+
+#### Microsoft Store
+
+Check for and install updates in the Microsoft Store.
+
+#### Windows Update
+
+Check for and install Windows updates. Due to how Windows Update handles drivers, the `drivers` updates category is excluded to avoid installing incorrect drivers.
+
+### Virus Scans
+
+Performs virus scans with various antivirus utilities.
+
+#### Microsoft Safety Scanner
+
+#### Malicious Software Removal Tool
+
+#### Kaspersky Virus Removal Tool
+
+#### Malwarebytes ADWCleaner
+
+### Optimize Disks
+
+Perform various disk cleanup and optimization functions.
+
+#### Disk Cleanup
+
+Runs `cleanmgr` with the `/verylowdisk` parameter.
+
+#### Storage Sense
+
+Enables Storage Sense and runs `cleanmgr` with the `/autoclean` parameter.
+
+#### Windows Update
+
+Clears the Windows Update cache.
+
+#### Windows Search
+
+Purge and reinitialize Windows Search.
+
+#### Bleachbit
+
+Runs Bleachbit with the `--clean flash.* internet_explorer.* system.logs system.memory_dump system.recycle_bin system.tmp` parameters.
+
+#### Optimize-Volume
+
+Runs `Optimize-Volume` on all drives with no parameters. This performs the default operation per drive type as follows.
+
+Default operations, quoted from the PowerShell documentation:
+
+> - HDD, Fixed VHD, Storage Space. -Analyze -Defrag.
+> - Tiered Storage Space. -TierOptimize.
+> - SSD with TRIM support. -Retrim.
+> - Storage Space (Thinly provisioned), SAN Virtual Disk (Thinly provisioned), Dynamic VHD, Differencing VHD. -Analyze -SlabConsolidate -Retrim.
+> - SSD without TRIM support, Removable FAT, Unknown. No operation.
+
+Further information can be found in the [Optimize-Volume Documentation](https://docs.microsoft.com/en-us/powershell/module/storage/optimize-volume).
 
 ## Parameters
 

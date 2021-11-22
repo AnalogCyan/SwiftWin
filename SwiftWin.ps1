@@ -319,7 +319,7 @@ function Get-Updates {
   #region Windows Update
   if ($UpdateSelection -eq "win-update" -or $UpdateSelection -eq "all") {
     Show-Message -MessageType "notice" -MessageText "Ignoring driver updates to avoid installing incorrect drivers..."
-    $jobName = Wait-Animation { $(if (Get-Command PSWindowsUpdate -ErrorAction SilentlyContinue) { Install-Module -ErrorAction SilentlyContinue -Name PSWindowsUpdate -Force }; Import-Module PSWindowsUpdate; Install-WindowsUpdate -AcceptAll -IgnoreReboot -MicrosoftUpdate -NotCategory "Drivers" -RecurseCycle 2) } "Checking for Windows Updates..."
+    $jobName = Wait-Animation { $(if (-not(Get-Command PSWindowsUpdate -ErrorAction SilentlyContinue)) { Install-Module -ErrorAction SilentlyContinue -Name PSWindowsUpdate -Force }; Import-Module PSWindowsUpdate; Install-WindowsUpdate -AcceptAll -IgnoreReboot -MicrosoftUpdate -NotCategory "Drivers" -RecurseCycle 2) } "Checking for Windows Updates..."
     Receive-Job -Job $jobName >> ./logs/winupdate_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
   #endregion

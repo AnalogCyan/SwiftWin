@@ -119,6 +119,11 @@ function Exit-Script {
   exit
 }
 
+function Clear-Logs {
+  Wait-Animation { $($logs = Get-ChildItem -Path ./logs -File -Recurse; $logs | ForEach-Object { $_.Delete() }) } "Cleaning up log files..."
+  Show-Menu "logs"
+}
+
 function Assert-Security {
   [CmdletBinding()]
   [OutputType([string])]
@@ -333,6 +338,74 @@ function Get-Updates {
   }
 }
 
+function Get-Advanced {
+  [CmdletBinding()]
+  [OutputType([string])]
+  param (
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [String]$AdvancedSelection
+  )
+  #region Fix Hyper-V Perms
+  if ($AdvancedSelection -eq "hyperv") {
+    #Import the NTFSSecurity Module, if not available, prompt to download it
+    If ((Get-Module).Name -notcontains 'NTFSSecurity') {
+      Write-Warning "This script depends on the NTFSSecurity Module, by MSFT"
+      if ($PSVersionTable.PSVersion.Major -ge 4) {
+        Write-Output "This script can attempt to download this module for you..."
+        $DownloadMod = Read-Host "Continue (y/n)?"
+
+        if ($DownloadMod.ToUpper() -like "Y*") {
+          Find-Module NTFSSecurity | Install-Module
+        }
+        else {
+          #User responded No, end
+          Write-Warning "Please download the NTFSSecurity module and continue"
+          break
+        }
+
+      }
+      else {
+        #Not running PowerShell v4 or higher
+        Write-Warning "Please download the NTFSSecurity module and continue"
+        break
+      }
+    }
+    else {
+      #Import the module, as it exists
+      Import-Module NTFSSecurity
+
+    }
+
+    $VMs = Get-VM
+    ForEach ($VM in $VMs) {
+      $disks = Get-VMHardDiskDrive -VMName $VM.Name
+      Write-Output "This VM $($VM.Name), contains $($disks.Count) disks, checking permissions..."
+
+      ForEach ($disk in $disks) {
+        $permissions = Get-NTFSAccess -Path $disk.Path
+        If ($permissions.Account -notcontains "NT Virtual Mach*") {
+          $disk.Path
+          Write-Host "This VHD has improper permissions, fixing..." -NoNewline
+          try {
+            Add-NTFSAccess -Path $disk.Path -Account "NT VIRTUAL MACHINE\$($VM.VMId)" -AccessRights FullControl -ErrorAction STOP
+          }
+          catch {
+            Write-Host -ForegroundColor red "[ERROR]"
+            Write-Warning "Try rerunning as Administrator, or validate your user ID has FullControl on the above path"
+            break
+          }
+
+          Write-Host -ForegroundColor Green "[OK]"
+
+        }
+
+      }
+    }
+  }
+  #endregion
+}
+
 <#
 .SYNOPSIS
 Display a menu and get user selection.
@@ -403,13 +476,21 @@ function Show-Menu {
   )
   switch ($Menu) {
     'main' {
-      switch (Get-MenuSelection -MenuPrompt "Main Menu" -MenuItems "Exit", "About", "Logs", "Updates", "Virus Scans", "Optimize Disks") {
+      switch (Get-MenuSelection -MenuPrompt "Main Menu" -MenuItems "Exit", "About", "Logs", "Updates", "Virus Scans", "Optimize Disks", "Advanced") {
         '0' { Exit-Script }
         '1' { Show-About }
-        '2' { explorer.exe .\logs }
+        '2' { Show-Menu "logs" }
         '3' { Show-Menu "updates" }
         '4' { Show-Menu "scans" }
         '5' { Show-Menu "disks" }
+        '6' { Show-Menu "advanced" }
+      }
+    }
+    'logs' {
+      switch (Get-MenuSelection -MenuPrompt "Logs" -MenuItems "Back", "View Logs", "Clear Logs") {
+        '0' { Show-Menu "main" }
+        '1' { explorer.exe .\logs }
+        '2' { Clear-Logs }
       }
     }
     'updates' {
@@ -442,6 +523,12 @@ function Show-Menu {
         '5' { Optimize-Disks "wspurge" }
         '6' { Optimize-Disks "bbit" }
         '7' { Optimize-Disks "defrag" }
+      }
+    }
+    'advanced' {
+      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms") {
+        '0' { Show-Menu "main" }
+        '1' { Get-Advanced "hyperv" }
       }
     }
     Default {

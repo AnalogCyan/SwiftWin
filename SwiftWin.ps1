@@ -406,10 +406,9 @@ function Get-Advanced {
   #endregion
 
   #region Repair System
-  Show-Message -NoNewline -MessageType "warn" -MessageText "This option will check the system for corruption, and attempt repairs if any is found. Continue? [y/N] "
-  if ($(Read-Host) -NotContains "y") { exit }
-
   if ($AdvancedSelection -eq "repair") {
+    Show-Message -NoNewline -MessageType "warn" -MessageText "This option will check the system for corruption, and attempt repairs if any is found. Continue? [y/N] "
+    if ($(Read-Host) -NotContains "y") { exit }
     dism /Online /Cleanup-Image /RestoreHealth
     dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase
     sfc /SCANNOW

@@ -417,7 +417,7 @@ function Get-Advanced {
     Show-Message -NoNewline -MessageType "notice" -MessageText "The script will open again after rebooting. Press Enter to reboot now."
     Read-Host
     Set-Restart
-    Restart-Computer -Confirm -Timeout 30
+    Restart-Computer -Confirm
   }
   #endregion
 }

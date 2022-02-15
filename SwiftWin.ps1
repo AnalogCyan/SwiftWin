@@ -404,6 +404,23 @@ function Get-Advanced {
     }
   }
   #endregion
+
+  #region Repair System
+  Show-Message -NoNewline -MessageType "warn" -MessageText "This option will check the system for corruption, and attempt repairs if any is found. Continue? [y/N] "
+  if ($(Read-Host) -NotContains "y") { exit }
+
+  if ($AdvancedSelection -eq "repair") {
+    dism /Online /Cleanup-Image /RestoreHealth
+    dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase
+    sfc /SCANNOW
+    chkdsk /F /R
+    Show-Message -MessageType "notice" -MessageText "A reboot is required to continue; the reboot may take a while depending on the size of your disk and level of corruption found."
+    Show-Message -NoNewline -MessageType "notice" -MessageText "The script will open again after rebooting. Press Enter to reboot now."
+    Read-Host
+    Set-Restart
+    Restart-Computer -Confirm -Timeout 30
+  }
+  #endregion
 }
 
 <#
@@ -526,9 +543,10 @@ function Show-Menu {
       }
     }
     'advanced' {
-      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms") {
+      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System") {
         '0' { Show-Menu "main" }
         '1' { Get-Advanced "hyperv" }
+        '2' { Get-Advanced "repair" }
       }
     }
     Default {

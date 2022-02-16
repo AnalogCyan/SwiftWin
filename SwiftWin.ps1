@@ -104,13 +104,14 @@ function Set-Restart {
   else { $runShell = "powerhell.exe" }
   if (Get-Command wt.exe -ErrorAction SilentlyContinue) { $runTerm = "wt.exe" }
   else { $runTerm = $runShell }
-  Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\RunOnce" -Name '!SwiftWin' -Value "powershell.exe -NoProfile -Command Start-Process $runTerm -Verb Runas -ArgumentList '$runShell -NoProfile -NoExit -Command $PWD\SwiftWin.ps1'"
+  Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\RunOnce" -Name '!SwiftWin' -Value "powershell.exe -NoProfile -Command Start-Process $runTerm -Verb Runas -ArgumentList '$runShell -NoProfile -NoExit -Command $ScriptDir\SwiftWin.ps1'"
 }
 
 function Invoke-Setup {
-  New-Item -ErrorAction Ignore -Path ./logs -ItemType directory
+  New-Item -ErrorAction Ignore -Path $PSScriptRoot\logs -ItemType directory
   New-Item -ErrorAction Ignore -Path $PSScriptRoot\temp -ItemType directory | Out-Null
   Get-Item $PSScriptRoot\temp -Force | ForEach-Object { $_.Attributes = $_.Attributes -bor "Hidden" }
+  Set-Location $PSScriptRoot
 }
 
 function Exit-Script {
@@ -542,10 +543,11 @@ function Show-Menu {
       }
     }
     'advanced' {
-      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System") {
+      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System", "DEBUG OPTION") {
         '0' { Show-Menu "main" }
         '1' { Get-Advanced "hyperv" }
         '2' { Get-Advanced "repair" }
+        '3' { Set-Restart; Restart-Computer -Confirm }
       }
     }
     Default {

@@ -421,6 +421,14 @@ function Get-Advanced {
     Restart-Computer -Confirm
   }
   #endregion
+
+  #region Install Utils
+  Show-Message -NoNewline -MessageType "warn" -MessageText "This option will attempt to install/update some useful system utilities. Continue? [y/N] "
+  if ($(Read-Host) -NotContains "y") { exit }
+  winget install --id=Microsoft.PowerShell -e -h --force ; winget install --id=Microsoft.WindowsTerminal -e -h --force ; winget install --id=Git.Git -e -h --force
+  Set-Restart
+  Restart-Computer -Confirm
+  #endregion
 }
 
 <#
@@ -543,11 +551,11 @@ function Show-Menu {
       }
     }
     'advanced' {
-      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System", "DEBUG OPTION") {
+      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System", "Install Utils") {
         '0' { Show-Menu "main" }
         '1' { Get-Advanced "hyperv" }
         '2' { Get-Advanced "repair" }
-        '3' { Set-Restart; Restart-Computer -Confirm }
+        '3' { Get-Advanced "utils" }
       }
     }
     Default {

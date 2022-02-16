@@ -418,7 +418,7 @@ function Get-Advanced {
     Show-Message -NoNewline -MessageType "notice" -MessageText "The script will open again after rebooting. Press Enter to reboot now."
     Read-Host
     Set-Restart
-    Restart-Computer -Confirm
+    Restart-Computer
   }
   #endregion
 
@@ -426,8 +426,22 @@ function Get-Advanced {
   Show-Message -NoNewline -MessageType "warn" -MessageText "This option will attempt to install/update some useful system utilities. Continue? [y/N] "
   if ($(Read-Host) -NotContains "y") { exit }
   winget install --id=Microsoft.PowerShell -e -h --force ; winget install --id=Microsoft.WindowsTerminal -e -h --force ; winget install --id=Git.Git -e -h --force
-  Set-Restart
-  Restart-Computer -Confirm
+  #endregion
+
+  #region WSL2
+  if ($AdvancedSelection -eq "wsl2") {
+    Show-Message -NoNewline -MessageType "warn" -MessageText "This option will attempt to install/update WSL2. Continue? [y/N] "
+    if ($(Read-Host) -NotContains "y") { exit }
+    dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+    dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+    Invoke-WebRequest -Uri 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi' -OutFile $PSScriptRoot\temp\wsl_update_x64.msi
+    Start-Process ".\temp\wsl_update_x64.msi" -Wait
+    wsl --set-default-version 2
+    Show-Message -MessageType "notice" -MessageText "A reboot is required to continue; the script will open again after rebooting. Press Enter to reboot now."
+    Read-Host
+    Set-Restart
+    Restart-Computer -Confirm
+  }
   #endregion
 }
 
@@ -551,11 +565,12 @@ function Show-Menu {
       }
     }
     'advanced' {
-      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System", "Install Utils") {
+      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System", "Install Utils", "Enable WSL2") {
         '0' { Show-Menu "main" }
         '1' { Get-Advanced "hyperv" }
         '2' { Get-Advanced "repair" }
         '3' { Get-Advanced "utils" }
+        '4' { Get-Advanced "wsl2" }
       }
     }
     Default {

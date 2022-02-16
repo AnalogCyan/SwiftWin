@@ -423,9 +423,11 @@ function Get-Advanced {
   #endregion
 
   #region Install Utils
-  Show-Message -NoNewline -MessageType "warn" -MessageText "This option will attempt to install/update some useful system utilities. Continue? [y/N] "
-  if ($(Read-Host) -NotContains "y") { exit }
-  winget install --id=Microsoft.PowerShell -e -h --force ; winget install --id=Microsoft.WindowsTerminal -e -h --force ; winget install --id=Git.Git -e -h --force
+  if ($AdvancedSelection -eq "utils") {
+    Show-Message -NoNewline -MessageType "warn" -MessageText "This option will attempt to install/update some useful system utilities. Continue? [y/N] "
+    if ($(Read-Host) -NotContains "y") { exit }
+    winget install --id=Microsoft.PowerShell -e -h --force ; winget install --id=Microsoft.WindowsTerminal -e -h --force ; winget install --id=Git.Git -e -h --force
+  }
   #endregion
 
   #region WSL2

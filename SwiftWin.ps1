@@ -104,7 +104,7 @@ function Set-Restart {
   else { $runShell = "powerhell.exe" }
   if (Get-Command wt.exe -ErrorAction SilentlyContinue) { $runTerm = "wt.exe" }
   else { $runTerm = $runShell }
-  Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\RunOnce" -Name '!SwiftWin' -Value "powershell.exe -NoProfile -Command Start-Process $runTerm -Verb Runas -ArgumentList '$runShell -NoProfile -NoExit -Command $ScriptDir\SwiftWin.ps1'"
+  Set-ItemProperty "HKLM:\Software\Microsoft\Windows\CurrentVersion\RunOnce" -Name '!SwiftWin' -Value "powershell.exe -NoProfile -Command Start-Process $runTerm -Verb Runas -ArgumentList '$runShell -NoProfile -NoExit -Command $PSScriptRoot\SwiftWin.ps1'"
 }
 
 function Invoke-Setup {

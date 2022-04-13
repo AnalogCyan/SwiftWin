@@ -271,7 +271,7 @@ function Optimize-Disks {
 
   #region Optimize-Volume
   if ($cleanSelection -eq "defrag" -or $cleanSelection -eq "all") {
-    $jobName = Wait-Animation { $($drives = (Get-PSDrive).Name -match '^[a-z]$'; foreach ($item in $drives) { Optimize-Volume -DriveLetter $item }) } "Optimizing Disks..."
+    $jobName = Wait-Animation { $(foreach ($item in $((Get-Volume).DriveLetter.Where({ $null -ne $_ }))) { Optimize-Volume -DriveLetter $item }) } "Optimizing Disks..."
     Receive-Job -Job $jobName >> ./logs/optimize_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
   #endregion

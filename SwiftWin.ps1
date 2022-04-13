@@ -309,8 +309,10 @@ function Get-Updates {
   if ($UpdateSelection -eq "winget" -or $UpdateSelection -eq "all") {
     Show-Message -MessageType "info" -MessageText "Checking for Windows Package Manager..."
     if (Get-Command winget.exe -ErrorAction SilentlyContinue) {
-      $jobName = Wait-Animation { $(winget upgrade --all) } "Windows Package Manager found, updating..."
-      Receive-Job -Job $jobName >> ./logs/winget_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+      Show-Message -NoNewline -MessageType "warn" -MessageText "This option must be run as a non-admin user. You will be prompted to authenticate a new session as the current user. Continue? [y/N] "
+      if ($(Read-Host) -NotContains "y") { exit }
+      Show-Message -MessageType "notice" -MessageText "Some applications may individually require and prompt you for admin to update."
+      runas /user:$env:USERNAME "winget upgrade --all"
     }
   }
   #endregion

@@ -339,113 +339,77 @@ function Get-Updates {
   }
 }
 
-function Get-Advanced {
-  [CmdletBinding()]
-  [OutputType([string])]
-  param (
-    [Parameter(Mandatory = $true)]
-    [ValidateNotNullOrEmpty()]
-    [String]$AdvancedSelection
-  )
-  #region Fix Hyper-V Perms
-  if ($AdvancedSelection -eq "hyperv") {
-    #Import the NTFSSecurity Module, if not available, prompt to download it
-    If ((Get-Module).Name -notcontains 'NTFSSecurity') {
-      Write-Warning "This script depends on the NTFSSecurity Module, by MSFT"
-      if ($PSVersionTable.PSVersion.Major -ge 4) {
-        Write-Output "This script can attempt to download this module for you..."
-        $DownloadMod = Read-Host "Continue (y/n)?"
+function Repair-HyperVPerms {
+  #Import the NTFSSecurity Module, if not available, prompt to download it
+  If ((Get-Module).Name -notcontains 'NTFSSecurity') {
+    Write-Warning "This script depends on the NTFSSecurity Module, by MSFT"
+    if ($PSVersionTable.PSVersion.Major -ge 4) {
+      Write-Output "This script can attempt to download this module for you..."
+      $DownloadMod = Read-Host "Continue (y/n)?"
 
-        if ($DownloadMod.ToUpper() -like "Y*") {
-          Find-Module NTFSSecurity | Install-Module
-        }
-        else {
-          #User responded No, end
-          Write-Warning "Please download the NTFSSecurity module and continue"
-          break
-        }
-
+      if ($DownloadMod.ToUpper() -like "Y*") {
+        Find-Module NTFSSecurity | Install-Module
       }
       else {
-        #Not running PowerShell v4 or higher
+        #User responded No, end
         Write-Warning "Please download the NTFSSecurity module and continue"
         break
       }
+
     }
     else {
-      #Import the module, as it exists
-      Import-Module NTFSSecurity
-
+      #Not running PowerShell v4 or higher
+      Write-Warning "Please download the NTFSSecurity module and continue"
+      break
     }
+  }
+  else {
+    #Import the module, as it exists
+    Import-Module NTFSSecurity
 
-    $VMs = Get-VM
-    ForEach ($VM in $VMs) {
-      $disks = Get-VMHardDiskDrive -VMName $VM.Name
-      Write-Output "This VM $($VM.Name), contains $($disks.Count) disks, checking permissions..."
+  }
 
-      ForEach ($disk in $disks) {
-        $permissions = Get-NTFSAccess -Path $disk.Path
-        If ($permissions.Account -notcontains "NT Virtual Mach*") {
-          $disk.Path
-          Write-Host "This VHD has improper permissions, fixing..." -NoNewline
-          try {
-            Add-NTFSAccess -Path $disk.Path -Account "NT VIRTUAL MACHINE\$($VM.VMId)" -AccessRights FullControl -ErrorAction STOP
-          }
-          catch {
-            Write-Host -ForegroundColor red "[ERROR]"
-            Write-Warning "Try rerunning as Administrator, or validate your user ID has FullControl on the above path"
-            break
-          }
+  $VMs = Get-VM
+  ForEach ($VM in $VMs) {
+    $disks = Get-VMHardDiskDrive -VMName $VM.Name
+    Write-Output "This VM $($VM.Name), contains $($disks.Count) disks, checking permissions..."
 
-          Write-Host -ForegroundColor Green "[OK]"
-
+    ForEach ($disk in $disks) {
+      $permissions = Get-NTFSAccess -Path $disk.Path
+      If ($permissions.Account -notcontains "NT Virtual Mach*") {
+        $disk.Path
+        Write-Host "This VHD has improper permissions, fixing..." -NoNewline
+        try {
+          Add-NTFSAccess -Path $disk.Path -Account "NT VIRTUAL MACHINE\$($VM.VMId)" -AccessRights FullControl -ErrorAction STOP
+        }
+        catch {
+          Write-Host -ForegroundColor red "[ERROR]"
+          Write-Warning "Try rerunning as Administrator, or validate your user ID has FullControl on the above path"
+          break
         }
 
+        Write-Host -ForegroundColor Green "[OK]"
+
       }
+
     }
   }
-  #endregion
-
-  #region Repair System
-  if ($AdvancedSelection -eq "repair") {
-    Show-Message -NoNewline -MessageType "warn" -MessageText "This option will check the system for corruption, and attempt repairs if any is found. Continue? [y/N] "
-    if ($(Read-Host) -NotContains "y") { exit }
-    dism /Online /Cleanup-Image /RestoreHealth
-    dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase
-    sfc /SCANNOW
-    chkdsk /F /R
-    Show-Message -MessageType "notice" -MessageText "A reboot is required to continue; the reboot may take a while depending on the size of your disk and level of corruption found."
-    Show-Message -NoNewline -MessageType "notice" -MessageText "The script will open again after rebooting. Press Enter to reboot now."
-    Read-Host
-    Set-Restart
-    Restart-Computer
-  }
-  #endregion
-
-  #region Install Utils
-  if ($AdvancedSelection -eq "utils") {
-    Show-Message -NoNewline -MessageType "warn" -MessageText "This option will attempt to install/update some useful system utilities. Continue? [y/N] "
-    if ($(Read-Host) -NotContains "y") { exit }
-    winget install --id=Microsoft.PowerShell -e -h --force ; winget install --id=Microsoft.WindowsTerminal -e -h --force ; winget install --id=Git.Git -e -h --force
-  }
-  #endregion
-
-  #region WSL2
-  if ($AdvancedSelection -eq "wsl2") {
-    Show-Message -NoNewline -MessageType "warn" -MessageText "This option will attempt to install/update WSL2. Continue? [y/N] "
-    if ($(Read-Host) -NotContains "y") { exit }
-    dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
-    dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
-    Invoke-WebRequest -Uri 'https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi' -OutFile $PSScriptRoot\temp\wsl_update_x64.msi
-    Start-Process ".\temp\wsl_update_x64.msi" -Wait
-    wsl --set-default-version 2
-    Show-Message -MessageType "notice" -MessageText "A reboot is required to continue; the script will open again after rebooting. Press Enter to reboot now."
-    Read-Host
-    Set-Restart
-    Restart-Computer -Confirm
-  }
-  #endregion
 }
+
+function Repair-System {
+  Show-Message -NoNewline -MessageType "warn" -MessageText "This option will check the system for corruption, and attempt repairs if any is found. Continue? [y/N] "
+  if ($(Read-Host) -NotContains "y") { exit }
+  dism /Online /Cleanup-Image /RestoreHealth
+  dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase
+  sfc /SCANNOW
+  chkdsk /F /R
+  Show-Message -MessageType "notice" -MessageText "A reboot is required to continue; the reboot may take a while depending on the size of your disk and level of corruption found."
+  Show-Message -NoNewline -MessageType "notice" -MessageText "The script will open again after rebooting. Press Enter to reboot now."
+  Read-Host
+  Set-Restart
+  Restart-Computer
+}
+
 
 <#
 .SYNOPSIS
@@ -567,12 +531,10 @@ function Show-Menu {
       }
     }
     'advanced' {
-      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System", "Install Utils", "Enable WSL2") {
+      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System") {
         '0' { Show-Menu "main" }
-        '1' { Get-Advanced "hyperv" }
-        '2' { Get-Advanced "repair" }
-        '3' { Get-Advanced "utils" }
-        '4' { Get-Advanced "wsl2" }
+        '1' { Repair-HyperVPerms }
+        '2' { Repair-System }
       }
     }
     Default {

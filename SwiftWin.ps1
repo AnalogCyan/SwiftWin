@@ -257,7 +257,7 @@ function Optimize-Disks {
 
   #region Windows Search Purge & Reinitialize
   if ($cleanSelection -eq "wspurge" -or $cleanSelection -eq "all") {
-    $jobName = Wait-Animation { $(cmd.exe /c "net stop WSearch"; cmd.exe /c "RD /S /Q 'C:\ProgramData\Microsoft\Search'"; Remove-Item -Path 'HKCU:\Software\Microsoft\Windows Search' -Recurse -Force; Remove-ItemProperty -Path 'HKLM:\Software\Microsoft\Windows Search' -Name 'SetupCompletedSuccessfully' -Force) } "Cleaning & Reinitializing Windows Search..."
+    $jobName = Wait-Animation { $(cmd.exe /c "net stop WSearch"; cmd.exe /c "if exist 'C:\ProgramData\Microsoft\Search\' RD /S /Q 'C:\ProgramData\Microsoft\Search'"; Remove-Item -ErrorAction Ignore -Path 'HKCU:\Software\Microsoft\Windows Search' -Recurse -Force; Remove-ItemProperty -ErrorAction Ignore -Path 'HKLM:\Software\Microsoft\Windows Search' -Name 'SetupCompletedSuccessfully' -Force) } "Cleaning & Reinitializing Windows Search..."
     Receive-Job -Job $jobName >> ./logs/wspurge_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
   #endregion

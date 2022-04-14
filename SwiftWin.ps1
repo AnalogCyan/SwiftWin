@@ -401,10 +401,19 @@ function Repair-HyperVPerms {
 function Repair-System {
   Show-Message -NoNewline -MessageType "warn" -MessageText "This option will check the system for corruption, and attempt repairs if any is found. Continue? [y/N] "
   if ($(Read-Host) -NotContains "y") { exit }
-  dism /Online /Cleanup-Image /RestoreHealth
-  dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase
-  sfc /SCANNOW
-  chkdsk /F /R
+
+  $jobName = Wait-Animation { $(dism /Online /Cleanup-Image /RestoreHealth) } "Running 'dism /Online /Cleanup-Image /RestoreHealth'..."
+  Receive-Job -Job $jobName >> ./logs/dism_restorehealth_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+
+  $jobName = Wait-Animation { $(dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase) } "Running 'dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase'..."
+  Receive-Job -Job $jobName >> ./logs/dism_cleanup_reset_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+
+  $jobName = Wait-Animation { $(sfc /SCANNOW) } "Running 'sfc /SCANNOW'..."
+  Receive-Job -Job $jobName >> ./logs/sfc_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+
+  Show-Message -NoNewline -MessageType "notice" -MessageText "Would you like to also run chkdsk? This operation may take a very long time. [y/N] "
+  if ($(Read-Host) -Contains "y") { chkdsk /F /R }
+
   Show-Message -MessageType "notice" -MessageText "A reboot is required to continue; the reboot may take a while depending on the size of your disk and level of corruption found."
   Show-Message -NoNewline -MessageType "notice" -MessageText "The script will open again after rebooting. Press Enter to reboot now."
   Read-Host

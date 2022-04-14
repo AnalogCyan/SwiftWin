@@ -23,63 +23,38 @@ The script's various functions are split into groups. Each group and its options
 
 Performs various software update functions.
 
-#### Chocolatey
-
-Check for and install updates in the Chocolatey package manager.
-
-#### Windows Package Manager
-
-Check for and install updates in the Windows Package Manager.
-
-#### Microsoft Store
-
-Check for and install updates in the Microsoft Store.
-
-#### Windows Update
-
-Check for and install Windows updates. Due to how Windows Update handles drivers, the `drivers` updates category is excluded to avoid installing incorrect drivers.
+| Option                  | Description                                                         |
+| ----------------------- | ------------------------------------------------------------------- |
+| Chocolatey              | Fetch updates from the Chocolatey package manager.                  |
+| Windows Package Manager | Fetch updates from the Windows Package Manager.                     |
+| Microsoft Store         | Fetch updates from the Microsoft Store.                             |
+| Windows Update          | Fetch Windows updates, skipping the the `drivers` updates category. |
 
 ### Virus Scans
 
 Performs virus scans with various antivirus utilities.
 
-#### Microsoft Safety Scanner
-
-#### Malicious Software Removal Tool
-
-#### Kaspersky Virus Removal Tool
-
-#### Malwarebytes ADWCleaner
+| Option                          | Description |
+| ------------------------------- | ----------- |
+| Microsoft Safety Scanner        |             |
+| Malicious Software Removal Tool |             |
+| Kaspersky Virus Removal Tool    |             |
+| Malwarebytes ADWCleaner         |             |
 
 ### Optimize Disks
 
 Perform various disk cleanup and optimization functions.
 
-#### Disk Cleanup
+| Option          | Description                                                                                                                            |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Disk Cleanup    | Runs `cleanmgr` with the `/verylowdisk` parameter.                                                                                     |
+| Storage Sense   | Enables Storage Sense and runs `cleanmgr` with the `/autoclean` parameter.                                                             |
+| Windows Update  | Clears the Windows Update cache.                                                                                                       |
+| Windows Search  | Purge and reinitialize Windows Search.                                                                                                 |
+| Bleachbit       | Runs Bleachbit with the `--clean flash.* internet_explorer.* system.logs system.memory_dump system.recycle_bin system.tmp` parameters. |
+| Optimize-Volume | Runs `Optimize-Volume` on all drives with no parameters. This performs the default operation per drive type.                           |
 
-Runs `cleanmgr` with the `/verylowdisk` parameter.
-
-#### Storage Sense
-
-Enables Storage Sense and runs `cleanmgr` with the `/autoclean` parameter.
-
-#### Windows Update
-
-Clears the Windows Update cache.
-
-#### Windows Search
-
-Purge and reinitialize Windows Search.
-
-#### Bleachbit
-
-Runs Bleachbit with the `--clean flash.* internet_explorer.* system.logs system.memory_dump system.recycle_bin system.tmp` parameters.
-
-#### Optimize-Volume
-
-Runs `Optimize-Volume` on all drives with no parameters. This performs the default operation per drive type as follows.
-
-Default operations, quoted from the PowerShell documentation:
+Default operations for `Optimize-Volume`, quoted from the PowerShell documentation:
 
 > - HDD, Fixed VHD, Storage Space. -Analyze -Defrag.
 > - Tiered Storage Space. -TierOptimize.

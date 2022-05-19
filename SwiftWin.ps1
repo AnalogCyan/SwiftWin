@@ -434,6 +434,13 @@ function Disable-Services {
   }
 }
 
+function Clear-iOSCache {
+  Show-Message -NoNewline -MessageType "warn" -MessageText "This option will delete ALL DATA for iTunes and 3uTools. Continue? [y/N] "
+  if ($(Read-Host) -NotContains "y") { exit }
+  Remove-Item -Force -Recurse "C:\3uTools\"
+  Remove-Item -Force -Recurse "C:\Users\suppo\AppData\Roaming\Apple Computer\"
+}
+
 <#
 .SYNOPSIS
 Display a menu and get user selection.
@@ -554,11 +561,12 @@ function Show-Menu {
       }
     }
     'advanced' {
-      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System", "Disable Services") {
+      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System", "Disable Services", "iOS Cache Cleanup") {
         '0' { Show-Menu "main" }
         '1' { Repair-HyperVPerms }
         '2' { Repair-System }
         '3' { Disable-Services }
+        '4' { Clear-iOSCache }
       }
     }
     Default {

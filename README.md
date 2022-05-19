@@ -64,6 +64,13 @@ Default operations for `Optimize-Volume`, quoted from the PowerShell documentati
 
 Further information can be found in the [Optimize-Volume Documentation](https://docs.microsoft.com/en-us/powershell/module/storage/optimize-volume).
 
+### Advanced
+
+| Option            | Description |
+| ----------------- | ----------- |
+| Fix Hyper-V Perms |             |
+| Repair System     |             |
+
 ## Parameters
 
 ### -?

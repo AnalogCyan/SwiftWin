@@ -438,7 +438,7 @@ function Clear-iOSCache {
   Show-Message -NoNewline -MessageType "warn" -MessageText "This option will delete ALL DATA for iTunes and 3uTools. Continue? [y/N] "
   if ($(Read-Host) -NotContains "y") { exit }
   Remove-Item -Force -Recurse "C:\3uTools\"
-  Remove-Item -Force -Recurse "C:\Users\suppo\AppData\Roaming\Apple Computer\"
+  Remove-Item -Force -Recurse "$env:APPDATA\Apple Computer\"
 }
 
 <#

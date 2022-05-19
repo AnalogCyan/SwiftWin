@@ -427,15 +427,10 @@ function Disable-Services {
   $services = @("Connected User Experiences and Telemetry", "Sysmain", "Windows Search")
   ForEach ($service in $services) {
     $service = Get-Service -Name "$service"
-    $service.Name
-    $service.Status
-    $service.StartMode
-    if ($service.Status -eq "Running" -and $service.StartMode -eq "Auto") {
-      Write-Output "Stopping service $($service.Name)..."
-      Stop-Service -Name $($service.Name)
-      Write-Output "Disabling service $($service.Name)..."
-      Disable-Service -Name $($service.Name)
-    }
+    Write-Output "Stopping service $($service.Name)..."
+    Stop-Service -Force -Name $($service.Name)
+    Write-Output "Disabling service $($service.Name)..."
+    Set-Service -Force -StartupType Disabled -Name $($service.Name)
   }
 }
 

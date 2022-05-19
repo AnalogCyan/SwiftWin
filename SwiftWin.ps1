@@ -430,7 +430,7 @@ function Disable-Services {
     Write-Output "Stopping service $($service.Name)..."
     Stop-Service -Force -Name $($service.Name)
     Write-Output "Disabling service $($service.Name)..."
-    Set-Service -Force -StartupType Disabled -Name $($service.Name)
+    Set-Service -StartupType Disabled -Name $($service.Name)
   }
 }
 

@@ -421,6 +421,23 @@ function Repair-System {
   Restart-Computer
 }
 
+function Disable-Services {
+  Show-Message -NoNewline -MessageType "warn" -MessageText "This option will disable the services 'DiagTrack', 'SysMain', & 'WSearch'. Continue? [y/N] "
+  if ($(Read-Host) -NotContains "y") { exit }
+  $services = @("Connected User Experiences and Telemetry", "Sysmain", "Windows Search")
+  ForEach ($service in $services) {
+    $service = Get-Service -Name "$service"
+    $service.Name
+    $service.Status
+    $service.StartMode
+    if ($service.Status -eq "Running" -and $service.StartMode -eq "Auto") {
+      Write-Output "Stopping service $($service.Name)..."
+      Stop-Service -Name $($service.Name)
+      Write-Output "Disabling service $($service.Name)..."
+      Disable-Service -Name $($service.Name)
+    }
+  }
+}
 
 <#
 .SYNOPSIS
@@ -542,10 +559,11 @@ function Show-Menu {
       }
     }
     'advanced' {
-      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System") {
+      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System", "Disable Services") {
         '0' { Show-Menu "main" }
         '1' { Repair-HyperVPerms }
         '2' { Repair-System }
+        '3' { Disable-Services }
       }
     }
     Default {

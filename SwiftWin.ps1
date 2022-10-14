@@ -136,11 +136,11 @@ function Assert-Security {
   #region Variables
   if ([System.Environment]::Is64BitOperatingSystem) {
     $msert = "https://go.microsoft.com/fwlink/?LinkId=212732"
-    $msrt = ($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=9905').Links | ForEach-Object { if ($_ -match "click here to download manually") { $_.href } }
+    $msrt = (Invoke-WebRequest -Uri 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=9905').Links | ForEach-Object { if ($_ -match "click here to download manually") { $_.href } }
   }
   else {
     $msert = "https://go.microsoft.com/fwlink/?LinkId=212733"
-    $msrt = ($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=16').Links | ForEach-Object { if ($_ -match "click here to download manually") { $_.href } }
+    $msrt = (Invoke-WebRequest -Uri 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=16').Links | ForEach-Object { if ($_ -match "click here to download manually") { $_.href } }
   }
   #endregion
 

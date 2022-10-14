@@ -136,11 +136,11 @@ function Assert-Security {
   #region Variables
   if ([System.Environment]::Is64BitOperatingSystem) {
     $msert = "https://go.microsoft.com/fwlink/?LinkId=212732"
-    $msrt = (Invoke-WebRequest -Uri 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=9905').Links | ForEach-Object { if ($_ -match "click here to download manually") { $_.href } }
+    $msrt = ($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=9905').Links | ForEach-Object { if ($_ -match "click here to download manually") { $_.href } }
   }
   else {
     $msert = "https://go.microsoft.com/fwlink/?LinkId=212733"
-    $msrt = (Invoke-WebRequest -Uri 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=16').Links | ForEach-Object { if ($_ -match "click here to download manually") { $_.href } }
+    $msrt = ($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri 'https://www.microsoft.com/en-us/download/confirmation.aspx?id=16').Links | ForEach-Object { if ($_ -match "click here to download manually") { $_.href } }
   }
   #endregion
 
@@ -154,28 +154,28 @@ function Assert-Security {
 
   #region Microsoft Safety Scanner
   if ($runSelection -eq "msert" -or $runSelection -eq "all") {
-    $jobName = Wait-Animation { $(Invoke-WebRequest -Uri $Using:msert -OutFile $Using:PSScriptRoot\temp\MSERT.exe; Start-Process "$Using:PSScriptRoot\temp\MSERT.exe" -ArgumentList "/Q /N" -Verb runAs -Wait) } "Running MSERT..."
+    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri $Using:msert -OutFile $Using:PSScriptRoot\temp\MSERT.exe; Start-Process "$Using:PSScriptRoot\temp\MSERT.exe" -ArgumentList "/Q /N" -Verb runAs -Wait) } "Running MSERT..."
     Get-Content C:/Windows/debug/msert.log >> ./logs/msert_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
   #endregion
 
   #region Malicious Software Removal Tool
   if ($runSelection -eq "msrt" -or $runSelection -eq "all") {
-    $jobName = Wait-Animation { $(Invoke-WebRequest -Uri $Using:msrt -OutFile $Using:PSScriptRoot\temp\MSRT.exe; Start-Process "$Using:PSScriptRoot\temp\MSRT.exe" -ArgumentList "/Q /N" -Verb runAs -Wait) } "Running MSRT..."
+    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri $Using:msrt -OutFile $Using:PSScriptRoot\temp\MSRT.exe; Start-Process "$Using:PSScriptRoot\temp\MSRT.exe" -ArgumentList "/Q /N" -Verb runAs -Wait) } "Running MSRT..."
     Get-Content C:/Windows/debug/mrt.log >> ./logs/msrt_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
   #endregion
 
   #region Kaspersky Virus Removal Tool
   if ($runSelection -eq "kvrt" -or $runSelection -eq "all") {
-    $jobName = Wait-Animation { $(Invoke-WebRequest -Uri 'https://devbuilds.s.kaspersky-labs.com/devbuilds/KVRT/latest/full/KVRT.exe' -OutFile $Using:PSScriptRoot\temp\KVRT.exe; Start-Process "$Using:PSScriptRoot\temp\KVRT.exe" -ArgumentList "-accepteula -processlevel 0 -noads -silent -allvolumes" -Verb runAs -Wait) } "Running KVRT..."
+    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri 'https://devbuilds.s.kaspersky-labs.com/devbuilds/KVRT/latest/full/KVRT.exe' -OutFile $Using:PSScriptRoot\temp\KVRT.exe; Start-Process "$Using:PSScriptRoot\temp\KVRT.exe" -ArgumentList "-accepteula -processlevel 0 -noads -silent -allvolumes" -Verb runAs -Wait) } "Running KVRT..."
     Receive-Job -Job $jobName >> ./logs/kvrt_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
   #endregion
 
   #region Malwarebytes ADWCleaner
   if ($runSelection -eq "adw" -or $runSelection -eq "all") {
-    $jobName = Wait-Animation { $(Invoke-WebRequest -Uri 'https://downloads.malwarebytes.com/file/adwcleaner' -OutFile $Using:PSScriptRoot\temp\ADWCleaner.exe; Start-Process "$Using:PSScriptRoot\temp\ADWCleaner.exe" -ArgumentList "/eula /scan /noreboot" -Verb runAs -Wait) } "Running ADWCleaner..."
+    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri 'https://downloads.malwarebytes.com/file/adwcleaner' -OutFile $Using:PSScriptRoot\temp\ADWCleaner.exe; Start-Process "$Using:PSScriptRoot\temp\ADWCleaner.exe" -ArgumentList "/eula /scan /noreboot" -Verb runAs -Wait) } "Running ADWCleaner..."
     Receive-Job -Job $jobName >> ./logs/adw_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
   #endregion
@@ -264,7 +264,7 @@ function Optimize-Disks {
 
   #region BleachBit
   if ($cleanSelection -eq "bbit" -or $cleanSelection -eq "all") {
-    $jobName = Wait-Animation { $(Invoke-WebRequest -Uri https://download.bleachbit.org/BleachBit-4.2.0-portable.zip -OutFile $Using:PSScriptRoot\temp\BleachBit-4.2.0-portable.zip; Expand-Archive -LiteralPath $Using:PSScriptRoot\temp\BleachBit-4.2.0-portable.zip -DestinationPath $Using:PSScriptRoot\temp; Start-Process "$Using:PSScriptRoot\temp\BleachBit-Portable\bleachbit_console.exe" -ArgumentList "--update-winapp2" -Verb runAs -Wait; Start-Process "$Using:PSScriptRoot\temp\BleachBit-Portable\bleachbit_console.exe" -ArgumentList "--clean flash.* internet_explorer.* system.logs system.memory_dump system.recycle_bin system.tmp" -Wait) } "Running BleachBit..."
+    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri https://download.bleachbit.org/BleachBit-4.2.0-portable.zip -OutFile $Using:PSScriptRoot\temp\BleachBit-4.2.0-portable.zip; Expand-Archive -LiteralPath $Using:PSScriptRoot\temp\BleachBit-4.2.0-portable.zip -DestinationPath $Using:PSScriptRoot\temp; Start-Process "$Using:PSScriptRoot\temp\BleachBit-Portable\bleachbit_console.exe" -ArgumentList "--update-winapp2" -Verb runAs -Wait; Start-Process "$Using:PSScriptRoot\temp\BleachBit-Portable\bleachbit_console.exe" -ArgumentList "--clean flash.* internet_explorer.* system.logs system.memory_dump system.recycle_bin system.tmp" -Wait) } "Running BleachBit..."
     Receive-Job -Job $jobName >> ./logs/bbit_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
   #endregion

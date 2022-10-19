@@ -305,6 +305,20 @@ function Get-Updates {
   }
   #endregion
 
+  #region Scoop
+  if ($UpdateSelection -eq "scoop" -or $UpdateSelection -eq "all") {
+    Show-Message -MessageType "info" -MessageText "Checking for Scoop..."
+    if (Get-Command scoop.exe -ErrorAction SilentlyContinue) {
+      $jobName = Wait-Animation { $(scoop update '*') } "Scoop found, updating..."
+      Receive-Job -Job $jobName >> ./logs/scoop_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    }
+    else {
+      $jobName = Wait-Animation { $(Set-ExecutionPolicy RemoteSigned -Scope CurrentUser; iex "& {$(irm get.scoop.sh)} -RunAsAdmin"; scoop install aria2) } "Scoop not found, installing..."
+      Receive-Job -Job $jobName >> ./logs/scoop_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    }
+  }
+  #endregion
+
   #region Windows Package Manager (winget)
   if ($UpdateSelection -eq "winget" -or $UpdateSelection -eq "all") {
     Show-Message -MessageType "info" -MessageText "Checking for Windows Package Manager..."

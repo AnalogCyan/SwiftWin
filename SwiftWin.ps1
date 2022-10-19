@@ -547,7 +547,7 @@ function Show-Menu {
         '0' { Show-Menu "main" }
         '1' { Get-Updates "all" }
         '2' { Get-Updates "choco" }
-        '3' { Get-Updates 'scooop' }
+        '3' { Get-Updates 'scoop' }
         '4' { Get-Updates "winget" }
         '5' { Get-Updates "msstore" }
         '6' { Get-Updates "win-update" }

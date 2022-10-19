@@ -450,11 +450,17 @@ function Protect-PowerShell {
     winget install "9N0DX20HK701"
     winget install "9MZ1SNWT0N5D"
     if ($?) {
+      if ($PSVersionTable.PSEdition -NotContains "Core") {
+        wt.exe -p "PowerShell" "$PSScriptRoot\SwiftWin.ps1"
+      } else {
+        # DISM /online /disable-feature /featurename:"MicrosoftWindowsPowerShellV2"
+        # DISM /online /disable-feature /featurename:"MicrosoftWindowsPowerShellV2Root"
+        # Disable-WindowsOptionalFeature -Online -FeatureName MicrosoftWindowsPowerShellV2
+        # Disable-WindowsOptionalFeature -Online -FeatureName MicrosoftWindowsPowerShellV2Root
+      }
+
       # Start-Process -FilePath "pwsh.exe" -ArgumentList '-NoProfile -NoExit -Command "Disable-WindowsOptionalFeature -Online -FeatureName MicrosoftWindowsPowerShellV2Root"' -Verb RunAs
       # Start-Process -FilePath "cmd.exe" -ArgumentList '/c "DISM /online /disable-feature /featurename:MicrosoftWindowsPowerShellV2Root"' -Verb RunAs
-      cmd.exe /C "DISM /online /disable-feature /featurename:MicrosoftWindowsPowerShellV2Root"
-      Start-Process -FilePath "pwsh.exe" -ArgumentList '-NoProfile -NoExit -Command "$PSScriptRoot\SwiftWin.ps1"' -Verb RunAs
-
     }
   }
   else { 

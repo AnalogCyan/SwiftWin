@@ -441,6 +441,28 @@ function Clear-iOSCache {
   Remove-Item -Force -Recurse "$env:APPDATA\Apple Computer\"
 }
 
+function Protect-PowerShell {
+  # Replace Windows PowerShell w/ modern PowerShell
+  # to enhance system security.
+  Show-Message -NoNewline -MessageType "warn" -MessageText "This option will disable PowerShell and fully replace it. This may break functionality of apps/services that rely on legacy PowerShell behavior. Continue? [y/N] "
+  if ($(Read-Host) -NotContains "y") { exit }
+  if (Get-Command winget.exe -ErrorAction SilentlyContinue) {
+    winget install "9N0DX20HK701"
+    winget install "9MZ1SNWT0N5D"
+    if ($?) {
+      # Start-Process -FilePath "pwsh.exe" -ArgumentList '-NoProfile -NoExit -Command "Disable-WindowsOptionalFeature -Online -FeatureName MicrosoftWindowsPowerShellV2Root"' -Verb RunAs
+      # Start-Process -FilePath "cmd.exe" -ArgumentList '/c "DISM /online /disable-feature /featurename:MicrosoftWindowsPowerShellV2Root"' -Verb RunAs
+      cmd.exe /C "DISM /online /disable-feature /featurename:MicrosoftWindowsPowerShellV2Root"
+      Start-Process -FilePath "pwsh.exe" -ArgumentList '-NoProfile -NoExit -Command "$PSScriptRoot\SwiftWin.ps1"' -Verb RunAs
+
+    }
+  }
+  else { 
+    Show-Message -MessageType "error" -MessageText "Unable to find winget.exe, aborting..."
+    Exit-Script
+  }
+}
+
 <#
 .SYNOPSIS
 Display a menu and get user selection.
@@ -561,12 +583,13 @@ function Show-Menu {
       }
     }
     'advanced' {
-      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System", "Disable Services", "iOS Cache Cleanup") {
+      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System", "Disable Services", "iOS Cache Cleanup", "Replace PowerShell") {
         '0' { Show-Menu "main" }
         '1' { Repair-HyperVPerms }
         '2' { Repair-System }
         '3' { Disable-Services }
         '4' { Clear-iOSCache }
+        '5' { Protect-PowerShell }
       }
     }
     Default {

@@ -543,13 +543,14 @@ function Show-Menu {
       }
     }
     'updates' {
-      switch (Get-MenuSelection -MenuPrompt "Updates" -MenuItems "Back", "All", "Chocolatey", "Windows Package Manager", "Microsoft Store", "Windows Update") {
+      switch (Get-MenuSelection -MenuPrompt "Updates" -MenuItems "Back", "All", "Chocolatey", "Scoop", "Windows Package Manager", "Microsoft Store", "Windows Update") {
         '0' { Show-Menu "main" }
         '1' { Get-Updates "all" }
         '2' { Get-Updates "choco" }
-        '3' { Get-Updates "winget" }
-        '4' { Get-Updates "msstore" }
-        '5' { Get-Updates "win-update" }
+        '3' { Get-Updates 'scooop' }
+        '4' { Get-Updates "winget" }
+        '5' { Get-Updates "msstore" }
+        '6' { Get-Updates "win-update" }
       }
     }
     'scans' {

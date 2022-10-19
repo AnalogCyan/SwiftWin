@@ -447,20 +447,19 @@ function Protect-PowerShell {
   Show-Message -NoNewline -MessageType "warn" -MessageText "This option will disable PowerShell and fully replace it. This may break functionality of apps/services that rely on legacy PowerShell behavior. Continue? [y/N] "
   if ($(Read-Host) -NotContains "y") { exit }
   if (Get-Command winget.exe -ErrorAction SilentlyContinue) {
-    winget install "9N0DX20HK701"
-    winget install "9MZ1SNWT0N5D"
-    if ($?) {
+    winget install --accept-package-agreements --accept-source-agreements --force -e "9N0DX20HK701"
+    $tmp_status = $?
+    winget install --accept-package-agreements --accept-source-agreements --force -e "9MZ1SNWT0N5D"
+    if ($? -And $tmp_status) {
       if ($PSVersionTable.PSEdition -NotContains "Core") {
         wt.exe -p "PowerShell" "$PSScriptRoot\SwiftWin.ps1"
-      } else {
+      }
+      else {
         # DISM /online /disable-feature /featurename:"MicrosoftWindowsPowerShellV2"
         # DISM /online /disable-feature /featurename:"MicrosoftWindowsPowerShellV2Root"
         # Disable-WindowsOptionalFeature -Online -FeatureName MicrosoftWindowsPowerShellV2
         # Disable-WindowsOptionalFeature -Online -FeatureName MicrosoftWindowsPowerShellV2Root
       }
-
-      # Start-Process -FilePath "pwsh.exe" -ArgumentList '-NoProfile -NoExit -Command "Disable-WindowsOptionalFeature -Online -FeatureName MicrosoftWindowsPowerShellV2Root"' -Verb RunAs
-      # Start-Process -FilePath "cmd.exe" -ArgumentList '/c "DISM /online /disable-feature /featurename:MicrosoftWindowsPowerShellV2Root"' -Verb RunAs
     }
   }
   else { 

@@ -308,7 +308,7 @@ function Get-Updates {
   #region Scoop
   if ($UpdateSelection -eq "scoop" -or $UpdateSelection -eq "all") {
     Show-Message -MessageType "info" -MessageText "Checking for Scoop..."
-    if (Get-Command scoop.exe -ErrorAction SilentlyContinue) {
+    if (Get-Command scoop.ps1 -ErrorAction SilentlyContinue) {
       $jobName = Wait-Animation { $(scoop update '*') } "Scoop found, updating..."
       Receive-Job -Job $jobName >> ./logs/scoop_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
     }

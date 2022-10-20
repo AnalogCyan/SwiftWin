@@ -444,21 +444,29 @@ function Clear-iOSCache {
 function Protect-PowerShell {
   # Replace Windows PowerShell w/ modern PowerShell
   # to enhance system security.
-  Show-Message -NoNewline -MessageType "warn" -MessageText "This option will disable PowerShell and fully replace it. This may break functionality of apps/services that rely on legacy PowerShell behavior. Continue? [y/N] "
+  Show-Message -MessageType "warn" -MessageText "This option will disable PowerShell and fully replace it."
+  Show-Message -NoNewline -MessageType "warn" -MessageText "This may break functionality of apps/services that rely on legacy PowerShell behavior. Continue? [y/N] "
   if ($(Read-Host) -NotContains "y") { exit }
   if (Get-Command winget.exe -ErrorAction SilentlyContinue) {
-    winget install --accept-package-agreements --accept-source-agreements --force -e "9N0DX20HK701"
-    $tmp_status = $?
-    winget install --accept-package-agreements --accept-source-agreements --force -e "9MZ1SNWT0N5D"
-    if ($? -And $tmp_status) {
+    winget install --accept-package-agreements --accept-source-agreements --force -e -h --id="9P7KNL5RWT25"
+    $wgs0 = $?
+    winget install --accept-package-agreements --accept-source-agreements --force -e -h --id="9N0DX20HK701"
+    $wgs1 = $?
+    winget install --accept-package-agreements --accept-source-agreements --force -e -h --id="9MZ1SNWT0N5D"
+    if ($? -And $wgs0 -And $wgs1) {
       if ($PSVersionTable.PSEdition -NotContains "Core") {
         wt.exe -p "PowerShell" "$PSScriptRoot\SwiftWin.ps1"
       }
       else {
-        # DISM /online /disable-feature /featurename:"MicrosoftWindowsPowerShellV2"
-        # DISM /online /disable-feature /featurename:"MicrosoftWindowsPowerShellV2Root"
-        # Disable-WindowsOptionalFeature -Online -FeatureName MicrosoftWindowsPowerShellV2
-        # Disable-WindowsOptionalFeature -Online -FeatureName MicrosoftWindowsPowerShellV2Root
+        DISM /NoRestart /Quiet /online /disable-feature /featurename:"MicrosoftWindowsPowerShellV2"
+        DISM /NoRestart /Quiet /online /disable-feature /featurename:"MicrosoftWindowsPowerShellV2Root"
+        takeown /R /F "C:\Windows\System32\WindowsPowerShell\"
+        icacls "C:\Windows\System32\WindowsPowerShell\" /t /c /GRANT Everyone:F
+        Remove-Item -LiteralPath "C:\Windows\System32\WindowsPowerShell\" -Recurse -Force
+        Show-Message -NoNewline -MessageType "notice" -MessageText "Updates require a reboot; the script will open again after rebooting. Press Enter to reboot now."
+        Read-Host
+        Set-Restart
+        Restart-Computer
       }
     }
   }

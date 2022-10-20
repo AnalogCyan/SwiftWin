@@ -447,6 +447,8 @@ function Protect-PowerShell {
   Show-Message -MessageType "warn" -MessageText "This option will disable PowerShell and fully replace it."
   Show-Message -NoNewline -MessageType "warn" -MessageText "This may break functionality of apps/services that rely on legacy PowerShell behavior. Continue? [y/N] "
   if ($(Read-Host) -NotContains "y") { exit }
+  Show-Message -NoNewline -MessageType "warn" -MessageText "This function has not been fully tested, and has no built-in method for undoing changes. Are you sure you want to continue? [y/N] "
+  if ($(Read-Host) -NotContains "y") { exit }
   if (Get-Command winget.exe -ErrorAction SilentlyContinue) {
     winget install --accept-package-agreements --accept-source-agreements --force -e -h --id="9P7KNL5RWT25"
     $wgs0 = $?

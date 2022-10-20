@@ -460,13 +460,17 @@ function Protect-PowerShell {
         wt.exe -p "PowerShell" "$PSScriptRoot\SwiftWin.ps1"
       }
       else {
+        # Disable Windows PowerShell v2
         DISM /NoRestart /Quiet /online /disable-feature /featurename:"MicrosoftWindowsPowerShellV2"
         DISM /NoRestart /Quiet /online /disable-feature /featurename:"MicrosoftWindowsPowerShellV2Root"
-        takeown /R /F "C:\Windows\System32\WindowsPowerShell\"
-        icacls "C:\Windows\System32\WindowsPowerShell\" /t /c /GRANT Everyone:F
-        Remove-Item -LiteralPath "C:\Windows\System32\WindowsPowerShell\" -Recurse -Force
-        Remove-Item -Path "C:\Users\$env:UserName\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Windows PowerShell" -Recurse -Force
-        Remove-Item -LiteralPath "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows PowerShell" -Recurse -Force
+
+        # Disable Windows PowerShell v5
+        # takeown /R /F "C:\Windows\System32\WindowsPowerShell\"
+        # icacls "C:\Windows\System32\WindowsPowerShell\" /t /c /GRANT Everyone:F
+        # Remove-Item -LiteralPath "C:\Windows\System32\WindowsPowerShell\" -Recurse -Force
+        # Remove-Item -Path "C:\Users\$env:UserName\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Windows PowerShell" -Recurse -Force
+        # Remove-Item -LiteralPath "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows PowerShell" -Recurse -Force
+        
         Show-Message -NoNewline -MessageType "notice" -MessageText "Updates require a reboot; the script will open again after rebooting. Press Enter to reboot now."
         Read-Host
         Set-Restart

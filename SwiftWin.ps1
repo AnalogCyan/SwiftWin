@@ -463,6 +463,8 @@ function Protect-PowerShell {
         takeown /R /F "C:\Windows\System32\WindowsPowerShell\"
         icacls "C:\Windows\System32\WindowsPowerShell\" /t /c /GRANT Everyone:F
         Remove-Item -LiteralPath "C:\Windows\System32\WindowsPowerShell\" -Recurse -Force
+        Remove-Item -Path "C:\Users\$env:UserName\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Windows PowerShell" -Recurse -Force
+        Remove-Item -LiteralPath "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Windows PowerShell" -Recurse -Force
         Show-Message -NoNewline -MessageType "notice" -MessageText "Updates require a reboot; the script will open again after rebooting. Press Enter to reboot now."
         Read-Host
         Set-Restart

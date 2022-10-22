@@ -12,6 +12,12 @@ SwiftWin.ps1
       [-Reset]
 ```
 
+> **Note:**
+>
+> If you haven't allowed the execution of external scripts on your system, you may have to precede the script command with:
+>
+> `Set-ExecutionPolicy Bypass -Scope Process -Force;`
+
 ## Description
 
 The `SwiftWin.ps1` script runs through a series of Windows maintenance tasks I commonly perform when cleaning up and optimizing a system.

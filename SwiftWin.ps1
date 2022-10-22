@@ -1,4 +1,5 @@
 #Requires -RunAsAdministrator
+#Requires -Version 5.1
 
 #region Variables
 $ver = "v0.1"
@@ -305,14 +306,29 @@ function Get-Updates {
   }
   #endregion
 
+  #region Scoop
+  if ($UpdateSelection -eq "scoop" -or $UpdateSelection -eq "all") {
+    Show-Message -MessageType "info" -MessageText "Checking for Scoop..."
+    if (Get-Command scoop.ps1 -ErrorAction SilentlyContinue) {
+      $jobName = Wait-Animation { $(scoop update '*') } "Scoop found, updating..."
+      Receive-Job -Job $jobName >> ./logs/scoop_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    }
+    else {
+      $jobName = Wait-Animation { $(Set-ExecutionPolicy RemoteSigned -Scope CurrentUser; iex "& {$(irm get.scoop.sh)} -RunAsAdmin"; scoop install aria2) } "Scoop not found, installing..."
+      Receive-Job -Job $jobName >> ./logs/scoop_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    }
+  }
+  #endregion
+
   #region Windows Package Manager (winget)
   if ($UpdateSelection -eq "winget" -or $UpdateSelection -eq "all") {
     Show-Message -MessageType "info" -MessageText "Checking for Windows Package Manager..."
     if (Get-Command winget.exe -ErrorAction SilentlyContinue) {
-      Show-Message -NoNewline -MessageType "warn" -MessageText "This option must be run as a non-admin user. You will be prompted to authenticate a new session as the current user. Continue? [y/N] "
-      if ($(Read-Host) -NotContains "y") { exit }
       Show-Message -MessageType "notice" -MessageText "Some applications may individually require and prompt you for admin to update."
-      runas /user:$env:USERNAME "winget upgrade --all"
+      winget upgrade --all
+    }
+    else {
+      Show-Message -MessageType "error" -MessageText "Winget not found, please manually install updates from Windows Update & Microsoft Store."
     }
   }
   #endregion
@@ -572,13 +588,14 @@ function Show-Menu {
       }
     }
     'updates' {
-      switch (Get-MenuSelection -MenuPrompt "Updates" -MenuItems "Back", "All", "Chocolatey", "Windows Package Manager", "Microsoft Store", "Windows Update") {
+      switch (Get-MenuSelection -MenuPrompt "Updates" -MenuItems "Back", "All", "Chocolatey", "Scoop", "Windows Package Manager", "Microsoft Store", "Windows Update") {
         '0' { Show-Menu "main" }
         '1' { Get-Updates "all" }
         '2' { Get-Updates "choco" }
-        '3' { Get-Updates "winget" }
-        '4' { Get-Updates "msstore" }
-        '5' { Get-Updates "win-update" }
+        '3' { Get-Updates 'scoop' }
+        '4' { Get-Updates "winget" }
+        '5' { Get-Updates "msstore" }
+        '6' { Get-Updates "win-update" }
       }
     }
     'scans' {

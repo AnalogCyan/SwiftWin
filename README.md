@@ -1,6 +1,7 @@
 # 🔮 SwiftWin
 
-⚠️ This script is a work in progress, some features are unfinished or broken.
+![](https://img.shields.io/badge/-Work%20in%20Progress-f00)
+![](https://img.shields.io/badge/PowerShell-≥5.1-informational)
 
 Swiftly maintain Windows with ease.
 
@@ -14,6 +15,8 @@ SwiftWin.ps1
 ## Description
 
 The `SwiftWin.ps1` script runs through a series of Windows maintenance tasks I commonly perform when cleaning up and optimizing a system.
+
+This script was designed and tested on Windows 11 with PowerShell 7, but in theory should work on any modern build of Windows ≥10 with PowerShell ≥5.1. No guarantees as to how well it'll work on other versions of Windows/PowerShell.
 
 ## Options
 
@@ -102,16 +105,6 @@ Accepted values: None
 Default value: None
 Required: False
 ```
-
-## Notes
-
-This script assumes you already have knowledge as to how it works, and thus may behave in ways you don't want. This includes but is not limited to: changing system settings, deleting files, and continuing when you'd rather it wait.
-
-I highly advise you have a look at the script for yourself, and modify it to better suit your personal needs, as opposed to blindly running it and hoping for the best.
-
-With all that noted, I do plan on adding more friendly controls in the future.
-
-This script was designed and tested on Windows 11 with PowerShell 7. No guarantees as to how well it'll work on other versions of Windows/PowerShell.
 
 ## Links
 

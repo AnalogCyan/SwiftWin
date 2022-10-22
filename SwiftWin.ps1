@@ -1,5 +1,6 @@
 #Requires -RunAsAdministrator
 #Requires -Version 5.1
+# Param()
 
 #region Variables
 $ver = "v0.1"
@@ -600,8 +601,8 @@ function Get-Args {
     [ValidateNotNullOrEmpty()]
     $args
   )
-  if ($args.Contains("-?")) { Show-About }
-  if ($args.Contains("-Reset")) { Reset-Script }
+  if ($args.Contains("-?") -Or $args.Contains("/?") -Or $args.Contains("-h") -Or $args.Contains("--help")) { Show-About }
+  if ($args.Contains("-Reset")) { Exit-Script }
   if ($args.Contains("-Verbose")) { Switch-Verbosity }
   exit
 }

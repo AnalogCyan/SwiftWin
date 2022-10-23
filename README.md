@@ -20,7 +20,7 @@ SwiftWin.ps1
 
 ## Description
 
-The `SwiftWin.ps1` script runs through a series of Windows maintenance tasks I commonly perform when cleaning up and optimizing a system.
+The `SwiftWin.ps1` script presents you with a series of Windows maintenance tasks to make performing such tasks easier.
 
 This script was designed and tested on Windows 11 with PowerShell 7, but in theory should work on any modern build of Windows ≥10 with PowerShell ≥5.1. No guarantees as to how well it'll work on other versions of Windows/PowerShell.
 

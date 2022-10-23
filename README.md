@@ -35,6 +35,7 @@ Performs various software update functions.
 | Option                  | Description                                                         |
 | ----------------------- | ------------------------------------------------------------------- |
 | Chocolatey              | Fetch updates from the Chocolatey package manager.                  |
+| Scoop                   | Fetch updates from the Scooop package manager.                      |
 | Windows Package Manager | Fetch updates from the Windows Package Manager.                     |
 | Microsoft Store         | Fetch updates from the Microsoft Store.                             |
 | Windows Update          | Fetch Windows updates, skipping the the `drivers` updates category. |
@@ -79,6 +80,8 @@ Further information can be found in the [Optimize-Volume Documentation](https://
 | ----------------- | ----------- |
 | Fix Hyper-V Perms |             |
 | Repair System     |             |
+| Disable Services  |             |
+| Clear iOS Cache   |             |
 
 ## Parameters
 

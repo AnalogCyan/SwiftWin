@@ -621,7 +621,7 @@ function Show-Menu {
       }
     }
     'advanced' {
-      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System", "Disable Services", "iOS Cache Cleanup", "Replace PowerShell") {
+      switch (Get-MenuSelection -MenuPrompt "Advanced" -MenuItems "Back", "Fix Hyper-V Perms", "Repair System", "Disable Services", "iOS Cache Cleanup", "Modify PowerShell") {
         '0' { Show-Menu "main" }
         '1' { Repair-HyperVPerms }
         '2' { Repair-System }

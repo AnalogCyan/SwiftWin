@@ -12,9 +12,15 @@ SwiftWin.ps1
       [-Reset]
 ```
 
+> **Note:**
+>
+> If you haven't allowed the execution of external scripts on your system, you may have to precede the script command with:
+>
+> `Set-ExecutionPolicy Bypass -Scope Process -Force;`
+
 ## Description
 
-The `SwiftWin.ps1` script runs through a series of Windows maintenance tasks I commonly perform when cleaning up and optimizing a system.
+The `SwiftWin.ps1` script presents you with a series of Windows maintenance tasks to make performing such tasks easier.
 
 This script was designed and tested on Windows 11 with PowerShell 7, but in theory should work on any modern build of Windows ≥10 with PowerShell ≥5.1. No guarantees as to how well it'll work on other versions of Windows/PowerShell.
 
@@ -29,6 +35,7 @@ Performs various software update functions.
 | Option                  | Description                                                         |
 | ----------------------- | ------------------------------------------------------------------- |
 | Chocolatey              | Fetch updates from the Chocolatey package manager.                  |
+| Scoop                   | Fetch updates from the Scooop package manager.                      |
 | Windows Package Manager | Fetch updates from the Windows Package Manager.                     |
 | Microsoft Store         | Fetch updates from the Microsoft Store.                             |
 | Windows Update          | Fetch Windows updates, skipping the the `drivers` updates category. |
@@ -73,6 +80,8 @@ Further information can be found in the [Optimize-Volume Documentation](https://
 | ----------------- | ----------- |
 | Fix Hyper-V Perms |             |
 | Repair System     |             |
+| Disable Services  |             |
+| Clear iOS Cache   |             |
 
 ## Parameters
 

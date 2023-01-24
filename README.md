@@ -36,7 +36,7 @@ Performs various software update functions.
 | ----------------------- | ------------------------------------------------------------------- |
 | Chocolatey              | Fetch updates from the Chocolatey package manager.                  |
 | Scoop                   | Fetch updates from the Scooop package manager.                      |
-| Windows Package Manager | Fetch updates from the Windows Package Manager.                     |
+| Windows Package Manager | Fetch updates from the Windows Package Manager (winget).            |
 | Microsoft Store         | Fetch updates from the Microsoft Store.                             |
 | Windows Update          | Fetch Windows updates, skipping the the `drivers` updates category. |
 

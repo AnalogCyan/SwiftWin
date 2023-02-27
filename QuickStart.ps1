@@ -1,5 +1,14 @@
-import isUUID from 'is-uuid';
-import isWsl from 'is-wsl';
+function IsWindowsTerminal ($childProcess) {
+  if (!$childProcess) {
+    return $false
+  }
+  elseif ($childProcess.ProcessName -eq 'WindowsTerminal') {
+    return $true
+  }
+  else {
+    return IsWindowsTerminal -childProcess $childProcess.Parent
+  }
+}
 
 function Show-Message {
   param (
@@ -63,6 +72,6 @@ else {
   }
 }
 
-if (-not $((process.platform === "win32" || isWsl) && isUUID.v4(process.env.WT_SESSION))) {
+if (-not $(IsWindowsTerminal)) {
   stop-process -Id $PID
 }

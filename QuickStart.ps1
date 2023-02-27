@@ -47,7 +47,7 @@ if ($(Get-Command pwsh.exe -ErrorAction SilentlyContinue) -and $(Get-Command wt.
 }
 else {
   if (Get-Command winget.exe -ErrorAction SilentlyContinue) {
-    $Utils = "9MZ1SNWT0N5D", "9MZ1SNWT0N5D", "Git.Git", "gerardog.gsudo"
+    $Utils = "9MZ1SNWT0N5D", "9N0DX20HK701", "Git.Git", "gerardog.gsudo"
     foreach ($Util in $Utils) {
       winget install --id "$Util" --silent --force  --accept-package-agreements --accept-source-agreements
     }

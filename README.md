@@ -126,7 +126,13 @@ Below is a list of links to any external resources used in this script.
 
 | Program                      | Link                                                                                                                                                         |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| PowerShell                   | [https://github.com/PowerShell/PowerShell](https://github.com/PowerShell/PowerShell)                                                                         |
+| Windows Terminal             | [https://github.com/microsoft/terminal](https://github.com/microsoft/terminal)                                                                               |
+| Git for Windows              | [https://github.com/git-for-windows/git](https://github.com/git-for-windows/git)                                                                             |
+| gsudo                        | [https://github.com/gerardog/gsudo](https://github.com/gerardog/gsudo)                                                                                       |
+| Windows Package Manager      | [https://github.com/microsoft/winget-cli](https://github.com/microsoft/winget-cli)                                                                           |
 | Chocolatey                   | [https://chocolatey.org/](https://chocolatey.org/)                                                                                                           |
+| Scoop                        | [https://scoop.sh](https://scoop.sh)                                                                                                                         |
 | PSWindowsUpdate              | [https://www.powershellgallery.com/packages/PSWindowsUpdate](https://www.powershellgallery.com/packages/PSWindowsUpdate)                                     |
 | WinDlg                       | [http://download.wdc.com/windlg/WinDlg_v1_29.zip](http://download.wdc.com/windlg/WinDlg_v1_29.zip)                                                           |
 | Bleachbit                    | [https://www.bleachbit.org/](https://www.bleachbit.org/)                                                                                                     |

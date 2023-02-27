@@ -44,17 +44,17 @@ if ($(Get-Command pwsh.exe -ErrorAction SilentlyContinue) -and $(Get-Command wt.
   git.exe clone 'https://github.com/AnalogCyan/SwiftWin.git'
   Set-ExecutionPolicy Bypass -Scope Process -Force
   sudo.exe 'wt.exe pwsh.exe -Command "./SwiftWin/SwiftWin.ps1"'
+  stop-process -Id $PID
 }
 else {
   if (Get-Command winget.exe -ErrorAction SilentlyContinue) {
     $Utils = "9MZ1SNWT0N5D", "9N0DX20HK701", "Git.Git", "gerardog.gsudo"
     foreach ($Util in $Utils) {
       winget install --id "$Util" --silent --force  --accept-package-agreements --accept-source-agreements
-      exit
     }
     #wt.exe 'pwsh.exe -Command "irm sw.thayn.xyz | iex"'
     wt.exe 'pwsh.exe -Command "./QuickStart.ps1"'
-    exit
+    stop-process -Id $PID
   }
   else {
     Show-Message -MessageType "error" -MessageText "Winget not found, please manually install updates from Windows Update & Microsoft Store and try again."

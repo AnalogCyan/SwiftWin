@@ -1,5 +1,3 @@
-#Requires -RunAsAdministrator
-
 function Show-Message {
   param (
     [Parameter(Mandatory = $false)]

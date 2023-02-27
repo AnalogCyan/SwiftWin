@@ -50,9 +50,11 @@ else {
     $Utils = "9MZ1SNWT0N5D", "9N0DX20HK701", "Git.Git", "gerardog.gsudo"
     foreach ($Util in $Utils) {
       winget install --id "$Util" --silent --force  --accept-package-agreements --accept-source-agreements
+      exit
     }
     #wt.exe 'pwsh.exe -Command "irm sw.thayn.xyz | iex"'
     wt.exe 'pwsh.exe -Command "./QuickStart.ps1"'
+    exit
   }
   else {
     Show-Message -MessageType "error" -MessageText "Winget not found, please manually install updates from Windows Update & Microsoft Store and try again."

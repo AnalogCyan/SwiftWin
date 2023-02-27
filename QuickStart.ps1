@@ -55,7 +55,12 @@ function Show-Message {
 if ($(Get-Command pwsh.exe -ErrorAction SilentlyContinue) -and $(Get-Command wt.exe -ErrorAction SilentlyContinue) -and $(Get-Command git.exe -ErrorAction SilentlyContinue) -and $(Get-Command sudo.exe -ErrorAction SilentlyContinue)) {
   git.exe clone 'https://github.com/AnalogCyan/SwiftWin.git'
   Set-ExecutionPolicy Bypass -Scope Process -Force
-  sudo.exe 'wt.exe pwsh.exe -Command "./SwiftWin/SwiftWin.ps1"'
+  if ($(IsWindowsTerminal)) {
+    sudo.exe 'pwsh.exe -Command "./SwiftWin/SwiftWin.ps1"'
+  }
+  else {
+    wt.exe 'sudo.exe pwsh.exe -Command "./SwiftWin/SwiftWin.ps1"' 
+  }
 }
 else {
   if (Get-Command winget.exe -ErrorAction SilentlyContinue) {
@@ -63,7 +68,6 @@ else {
     foreach ($Util in $Utils) {
       winget install --id "$Util" --silent --force  --accept-package-agreements --accept-source-agreements
     }
-    #wt.exe 'pwsh.exe -Command "irm sw.thayn.xyz | iex"'
     wt.exe 'pwsh.exe -Command "./QuickStart.ps1"'
   }
   else {

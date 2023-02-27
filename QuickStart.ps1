@@ -56,7 +56,7 @@ if ($(Get-Command pwsh.exe -ErrorAction SilentlyContinue) -and $(Get-Command wt.
   git.exe clone 'https://github.com/AnalogCyan/SwiftWin.git' "$env:UserProfile/SwiftWin/"
   Set-ExecutionPolicy Bypass -Scope Process -Force
   if ($(IsWindowsTerminal)) {
-    sudo.exe pwsh.exe -Command "$env:UserProfile/SwiftWin/SwiftWin.ps1"
+    wt.exe -w 0 new-tab sudo.exe pwsh.exe -Command "$env:UserProfile/SwiftWin/SwiftWin.ps1"
   }
   else {
     wt.exe sudo.exe pwsh.exe -Command "$env:UserProfile/SwiftWin/SwiftWin.ps1"

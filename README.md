@@ -21,7 +21,7 @@ SwiftWin.ps1
 > You can also quickly get started by running the following in an admin PowerShell window:
 > (this will download a quick-start script for you, install some utilities, and run SwiftWin)
 >
-> `irm sw.thayn.xyz | iex`
+> `irm sw.thayn.me | iex`
 
 ## Description
 

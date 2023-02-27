@@ -43,7 +43,7 @@ function Show-Message {
 if ($(Get-Command pwsh.exe -ErrorAction SilentlyContinue) -and $(Get-Command wt.exe -ErrorAction SilentlyContinue) -and $(Get-Command git.exe -ErrorAction SilentlyContinue) -and $(Get-Command sudo.exe -ErrorAction SilentlyContinue)) {
   git.exe clone 'https://github.com/AnalogCyan/SwiftWin.git'
   Set-ExecutionPolicy Bypass -Scope Process -Force
-  sudo.exe 'wt.exe "./SwiftWin/SwiftWin.ps1"'
+  sudo.exe 'wt.exe pwsh.exe -Command "./SwiftWin/SwiftWin.ps1"'
 }
 else {
   if (Get-Command winget.exe -ErrorAction SilentlyContinue) {

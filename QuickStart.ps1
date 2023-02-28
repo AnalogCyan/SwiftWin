@@ -55,7 +55,7 @@ function Show-Message {
 if ($(Get-Command pwsh.exe -ErrorAction SilentlyContinue) -and $(Get-Command wt.exe -ErrorAction SilentlyContinue) -and $(Get-Command git.exe -ErrorAction SilentlyContinue) -and $(Get-Command sudo.exe -ErrorAction SilentlyContinue)) {
   git.exe clone 'https://github.com/AnalogCyan/SwiftWin.git' "$env:UserProfile/SwiftWin/"
   Set-ExecutionPolicy Bypass -Scope Process -Force
-  wt.exe -w 0 new-tab pwsh.exe -Command "sudo.exe $env:UserProfile/SwiftWin/SwiftWin.ps1"
+  wt.exe --window 0 -d "$pwd" pwsh.exe -noExit "sudo.exe $env:UserProfile/SwiftWin/SwiftWin.ps1"
 }
 else {
   if (Get-Command winget.exe -ErrorAction SilentlyContinue) {

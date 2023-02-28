@@ -18,7 +18,7 @@ SwiftWin.ps1
 >
 > `Set-ExecutionPolicy Bypass -Scope Process -Force;`
 
-> You can also quickly get started by running the following in an admin PowerShell window:
+> You can also quickly get started by running the following in a Windows PowerShell window:
 > (this will download a quick-start script for you, install some utilities, and run SwiftWin)
 >
 > `irm sw.thayn.me | iex`

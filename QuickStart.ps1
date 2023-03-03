@@ -53,10 +53,10 @@ function Show-Message {
 }
 
 if ($(Get-Command pwsh.exe -ErrorAction SilentlyContinue) -and $(Get-Command wt.exe -ErrorAction SilentlyContinue) -and $(Get-Command git.exe -ErrorAction SilentlyContinue) -and $(Get-Command sudo.exe -ErrorAction SilentlyContinue)) {
-  if (Test-Path "$env:UserProfile/SwiftWin/") { Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$env:UserProfile/SwiftWin/" }
-  git.exe clone 'https://github.com/AnalogCyan/SwiftWin.git' "$env:UserProfile/SwiftWin/"
+  if (Test-Path "$env:TMP/SwiftWin/") { Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$env:TMP/SwiftWin/" }
+  git.exe clone 'https://github.com/AnalogCyan/SwiftWin.git' "$env:TMP/SwiftWin/"
   Set-ExecutionPolicy Bypass -Scope Process -Force
-  wt.exe --window 0 -d "$pwd" pwsh.exe -noExit -Command "sudo.exe $env:UserProfile/SwiftWin/SwiftWin.ps1"
+  wt.exe --window 0 -d "$pwd" pwsh.exe -noExit -Command "sudo.exe $env:TMP/SwiftWin/SwiftWin.ps1"
 }
 else {
   if (Get-Command winget.exe -ErrorAction SilentlyContinue) {

@@ -25,12 +25,12 @@ function Show-Message {
   )
 
   switch ($MessageType) {
-    'info' { Write-Host -NoNewline:$NoNewline -ForegroundColor Blue "[INFO] " }
-    'notice' { Write-Host -NoNewline:$NoNewline -ForegroundColor DarkYellow "[NOTICE] " }
-    'warn' { Write-Host -NoNewline:$NoNewline -ForegroundColor Red "[WARN] " }
-    'error' { Write-Host -NoNewline:$NoNewline -ForegroundColor Red "[ERROR] " }
-    'success' { Write-Host -NoNewline:$NoNewline -ForegroundColor Green "[DONE] " }
-    default { Write-Host -NoNewline:$NoNewline "[UNKNOWN MESSAGE TYPE: $MessageType] " }
+    'info' { Write-Host -NoNewline -ForegroundColor Blue "[INFO] " }
+    'notice' { Write-Host -NoNewline -ForegroundColor DarkYellow "[NOTICE] " }
+    'warn' { Write-Host -NoNewline -ForegroundColor Red "[WARN] " }
+    'error' { Write-Host -NoNewline -ForegroundColor Red "[ERROR] " }
+    'success' { Write-Host -NoNewline -ForegroundColor Green "[DONE] " }
+    default { Write-Host -NoNewline "[UNKNOWN MESSAGE TYPE: $MessageType] " }
   }
   Write-Host -NoNewline:$NoNewline $MessageText
   Start-Sleep -Seconds 1

@@ -57,7 +57,7 @@ function Invoke-SwiftWin {
   if (Test-Path "$env:TMP/SwiftWin/") { Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$env:TMP/SwiftWin/" }
   git.exe clone 'https://github.com/AnalogCyan/SwiftWin.git' "$env:TMP/SwiftWin/"
   Set-ExecutionPolicy Bypass -Scope Process -Force
-  wt.exe --window 0 -d "$pwd" pwsh.exe -noExit -Command '$Env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User"); gsudo.exe $env:TMP/SwiftWin/SwiftWin.ps1'
+  wt.exe --window 0 -d "$pwd" pwsh.exe -noExit -Command "$Env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path', 'User'); gsudo.exe $env:TMP/SwiftWin/SwiftWin.ps1"
 }
 
 if ($(Get-Command pwsh.exe -ErrorAction SilentlyContinue) -and $(Get-Command wt.exe -ErrorAction SilentlyContinue) -and $(Get-Command git.exe -ErrorAction SilentlyContinue) -and $(Get-Command gsudo.exe -ErrorAction SilentlyContinue)) {

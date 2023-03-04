@@ -36,8 +36,6 @@ function Show-Message {
   Start-Sleep -Seconds 1
 }
 
-
-
 function Invoke-SwiftWin {
   $Env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")  
   if (Test-Path "$env:LOCALAPPDATA/SwiftWin/") { Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$env:LOCALAPPDATA/SwiftWin/" }

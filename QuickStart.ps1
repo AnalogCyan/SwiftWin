@@ -52,11 +52,15 @@ function Show-Message {
   Start-Sleep -Seconds 1
 }
 
-if ($(Get-Command pwsh.exe -ErrorAction SilentlyContinue) -and $(Get-Command wt.exe -ErrorAction SilentlyContinue) -and $(Get-Command git.exe -ErrorAction SilentlyContinue) -and $(Get-Command gsudo.exe -ErrorAction SilentlyContinue)) {
+function Invoke-SwiftWin {
   if (Test-Path "$env:TMP/SwiftWin/") { Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$env:TMP/SwiftWin/" }
   git.exe clone 'https://github.com/AnalogCyan/SwiftWin.git' "$env:TMP/SwiftWin/"
   Set-ExecutionPolicy Bypass -Scope Process -Force
   wt.exe --window 0 -d "$pwd" pwsh.exe -noExit -Command "gsudo.exe $env:TMP/SwiftWin/SwiftWin.ps1"
+}
+
+if ($(Get-Command pwsh.exe -ErrorAction SilentlyContinue) -and $(Get-Command wt.exe -ErrorAction SilentlyContinue) -and $(Get-Command git.exe -ErrorAction SilentlyContinue) -and $(Get-Command gsudo.exe -ErrorAction SilentlyContinue)) {
+  Invoke-SwiftWin
 }
 else {
   if (Get-Command winget.exe -ErrorAction SilentlyContinue) {
@@ -64,7 +68,7 @@ else {
     foreach ($Util in $Utils) {
       winget install --id "$Util" --silent --force  --accept-package-agreements --accept-source-agreements
     }
-    irm sw.thayn.me | iex
+    Invoke-SwiftWin
   }
   else {
     Show-Message -MessageType "error" -MessageText "Winget not found, please manually install updates from Windows Update & Microsoft Store and try again."

@@ -11,46 +11,32 @@ function IsWindowsTerminal ($childProcess) {
 }
 
 function Show-Message {
+  [CmdletBinding()]
   param (
     [Parameter(Mandatory = $false)]
     [Switch]
     $NoNewline,
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [String[]]$MessageType,
+    [String]$MessageType,
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
-    [String[]]$MessageText
+    [String]$MessageText
   )
+
   switch ($MessageType) {
-    'info' {
-      Write-Host -NoNewline -f Blue "[INFO] "
-      if ($NoNewline) { Write-Host -NoNewline $MessageText }
-      else { Write-Host $MessageText }
-    }
-    'notice' {
-      Write-Host -NoNewline -f DarkYellow "[NOTICE] "
-      if ($NoNewline) { Write-Host -NoNewline $MessageText }
-      else { Write-Host $MessageText }
-    }
-    'warn' {
-      Write-Host -NoNewline -f Red "[WARN] "
-      if ($NoNewline) { Write-Host -NoNewline $MessageText }
-      else { Write-Host $MessageText }
-    }
-    'error' {
-      Write-Host -NoNewline -f Red "[ERROR] "
-      if ($NoNewline) { Write-Host -NoNewline $MessageText }
-      else { Write-Host $MessageText }
-    }
-    'success' {
-      Write-Host -NoNewline -f Green "[DONE] "
-      if ($NoNewline) { Write-Host -NoNewline $MessageText }
-      else { Write-Host $MessageText }
-    }
+    'info' { Write-Host -NoNewline:$NoNewline -ForegroundColor Blue "[INFO] " }
+    'notice' { Write-Host -NoNewline:$NoNewline -ForegroundColor DarkYellow "[NOTICE] " }
+    'warn' { Write-Host -NoNewline:$NoNewline -ForegroundColor Red "[WARN] " }
+    'error' { Write-Host -NoNewline:$NoNewline -ForegroundColor Red "[ERROR] " }
+    'success' { Write-Host -NoNewline:$NoNewline -ForegroundColor Green "[DONE] " }
+    default { Write-Host -NoNewline:$NoNewline "[UNKNOWN MESSAGE TYPE: $MessageType] " }
   }
+  Write-Host -NoNewline $MessageText
   Start-Sleep -Seconds 1
 }
+
+
 
 function Invoke-SwiftWin {
   $Env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")  

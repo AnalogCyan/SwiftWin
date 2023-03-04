@@ -81,7 +81,7 @@ function Show-Message {
     'success' { Write-Host -NoNewline:$NoNewline -ForegroundColor Green "[DONE] " }
     default { Write-Host -NoNewline:$NoNewline "[UNKNOWN MESSAGE TYPE: $MessageType] " }
   }
-  Write-Host -NoNewline $MessageText
+  Write-Host -NoNewline:$NoNewline $MessageText
   Start-Sleep -Seconds 1
 }
 

@@ -57,15 +57,15 @@ function Invoke-SwiftWin {
   if (Test-Path "$env:TMP/SwiftWin/") { Remove-Item -Force -Recurse -ErrorAction SilentlyContinue "$env:TMP/SwiftWin/" }
   git.exe clone 'https://github.com/AnalogCyan/SwiftWin.git' "$env:TMP/SwiftWin/"
   Set-ExecutionPolicy Bypass -Scope Process -Force
-  wt.exe --window 0 -d "$pwd" pwsh.exe -noExit -Command "$Env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path', 'User'); gsudo.exe $env:TMP/SwiftWin/SwiftWin.ps1"
+  pwsh.exe -noExit -Command "$Env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [System.Environment]::GetEnvironmentVariable('Path', 'User')); gsudo.exe $env:TMP/SwiftWin/SwiftWin.ps1"
 }
 
-if ($(Get-Command pwsh.exe -ErrorAction SilentlyContinue) -and $(Get-Command wt.exe -ErrorAction SilentlyContinue) -and $(Get-Command git.exe -ErrorAction SilentlyContinue) -and $(Get-Command gsudo.exe -ErrorAction SilentlyContinue)) {
+if ($(Get-Command pwsh.exe -ErrorAction SilentlyContinue) -and $(Get-Command git.exe -ErrorAction SilentlyContinue) -and $(Get-Command gsudo.exe -ErrorAction SilentlyContinue)) {
   Invoke-SwiftWin
 }
 else {
   if (Get-Command winget.exe -ErrorAction SilentlyContinue) {
-    $Utils = "9MZ1SNWT0N5D", "9N0DX20HK701", "Git.Git", "gerardog.gsudo"
+    $Utils = "9MZ1SNWT0N5D", "Git.Git", "gerardog.gsudo"
     foreach ($Util in $Utils) {
       winget install --id "$Util" --silent --force  --accept-package-agreements --accept-source-agreements
     }

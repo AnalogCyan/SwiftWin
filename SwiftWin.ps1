@@ -131,7 +131,6 @@ function Assert-Security {
   #endregion
 
   #region Alerts & Confirmations
-  Show-Message -MessageType 'notice' "This option is a work in progress, and does not currently actively clean threats."
   Show-Message -NoNewline -MessageType "warn" -MessageText "This option will automatically clean any perceived threats. Continue? [y/N] "
   if ($(Read-Host) -NotContains "y") { exit }
   Show-Message -NoNewline -MessageType "warn" -MessageText "This option will automatically reboot the system when complete. Continue? [y/N] "
@@ -140,28 +139,28 @@ function Assert-Security {
 
   #region Microsoft Safety Scanner
   if ($runSelection -eq "msert" -or $runSelection -eq "all") {
-    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri $Using:msert -OutFile $Using:PSScriptRoot\temp\MSERT.exe; Start-Process "$Using:PSScriptRoot\temp\MSERT.exe" -ArgumentList "/Q /N" -Verb runAs -Wait) } "Running MSERT..."
+    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri $Using:msert -OutFile $Using:PSScriptRoot\temp\MSERT.exe; Start-Process "$Using:PSScriptRoot\temp\MSERT.exe" -ArgumentList "/Q /F:Y /N" -Verb runAs -Wait) } "Running MSERT..."
     Get-Content C:/Windows/debug/msert.log >> ./logs/msert_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
   #endregion
 
   #region Malicious Software Removal Tool
   if ($runSelection -eq "msrt" -or $runSelection -eq "all") {
-    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri $Using:msrt -OutFile $Using:PSScriptRoot\temp\MSRT.exe; Start-Process "$Using:PSScriptRoot\temp\MSRT.exe" -ArgumentList "/Q /N" -Verb runAs -Wait) } "Running MSRT..."
+    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri $Using:msrt -OutFile $Using:PSScriptRoot\temp\MSRT.exe; Start-Process "$Using:PSScriptRoot\temp\MSRT.exe" -ArgumentList "/Q /F:Y /N" -Verb runAs -Wait) } "Running MSRT..."
     Get-Content C:/Windows/debug/mrt.log >> ./logs/msrt_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
   #endregion
 
   #region Kaspersky Virus Removal Tool
   if ($runSelection -eq "kvrt" -or $runSelection -eq "all") {
-    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri 'https://devbuilds.s.kaspersky-labs.com/devbuilds/KVRT/latest/full/KVRT.exe' -OutFile $Using:PSScriptRoot\temp\KVRT.exe; Start-Process "$Using:PSScriptRoot\temp\KVRT.exe" -ArgumentList "-accepteula -processlevel 0 -noads -silent -allvolumes" -Verb runAs -Wait) } "Running KVRT..."
+    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri 'https://devbuilds.s.kaspersky-labs.com/devbuilds/KVRT/latest/full/KVRT.exe' -OutFile $Using:PSScriptRoot\temp\KVRT.exe; Start-Process "$Using:PSScriptRoot\temp\KVRT.exe" -ArgumentList "-accepteula -processlevel 2 -noads -silent -adinsilent -allvolumes" -Verb runAs -Wait) } "Running KVRT..."
     Receive-Job -Job $jobName >> ./logs/kvrt_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
   #endregion
 
   #region Malwarebytes ADWCleaner
   if ($runSelection -eq "adw" -or $runSelection -eq "all") {
-    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri 'https://downloads.malwarebytes.com/file/adwcleaner' -OutFile $Using:PSScriptRoot\temp\ADWCleaner.exe; Start-Process "$Using:PSScriptRoot\temp\ADWCleaner.exe" -ArgumentList "/eula /scan /noreboot" -Verb runAs -Wait) } "Running ADWCleaner..."
+    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri 'https://downloads.malwarebytes.com/file/adwcleaner' -OutFile $Using:PSScriptRoot\temp\ADWCleaner.exe; Start-Process "$Using:PSScriptRoot\temp\ADWCleaner.exe" -ArgumentList "/eula /clean /noreboot" -Verb runAs -Wait) } "Running ADWCleaner..."
     Receive-Job -Job $jobName >> ./logs/adw_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
   #endregion

@@ -131,7 +131,7 @@ function Assert-Security {
   #endregion
 
   #region Alerts & Confirmations
-  Show-Message -NoNewline -MessageType "warn" -MessageText "This option will automatically clean any perceived threats."
+  Show-Message -MessageType "warn" -MessageText "This option will automatically clean any perceived threats."
   Show-Message -NoNewline -MessageType "warn" -MessageText "This includes medium-to-high threats, and some PUPs. Continue? [y/N] "
   if ($(Read-Host) -NotContains "y") { exit }
   Show-Message -NoNewline -MessageType "warn" -MessageText "This option will automatically reboot the system when complete. Continue? [y/N] "

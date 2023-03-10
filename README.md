@@ -25,9 +25,9 @@ SwiftWin.ps1
 
 ## Description
 
-The `SwiftWin.ps1` script presents you with a series of Windows maintenance tasks to make performing such tasks easier.
+The `SwiftWin.ps1` script provides a set of Windows maintenance tasks to simplify their execution.
 
-This script was designed and tested on Windows 11 with PowerShell 7, but in theory should work on any modern build of Windows ≥10 with PowerShell ≥5.1. No guarantees as to how well it'll work on other versions of Windows/PowerShell.
+This script was designed and tested on Windows 11 with PowerShell 7. However, it should theoretically work on any modern build of Windows ≥10 with PowerShell ≥5.1. Note that there are no guarantees on its performance on other versions of Windows or PowerShell.
 
 ## Options
 
@@ -37,24 +37,24 @@ The script's various functions are split into groups. Each group and its options
 
 Performs various software update functions.
 
-| Option                  | Description                                                         |
-| ----------------------- | ------------------------------------------------------------------- |
-| Chocolatey              | Fetch updates from the Chocolatey package manager.                  |
-| Scoop                   | Fetch updates from the Scooop package manager.                      |
-| Windows Package Manager | Fetch updates from the Windows Package Manager.                     |
-| Microsoft Store         | Fetch updates from the Microsoft Store.                             |
-| Windows Update          | Fetch Windows updates, skipping the the `drivers` updates category. |
+| Option                  | Description                                                          |
+| ----------------------- | -------------------------------------------------------------------- |
+| Chocolatey              | Fetch updates from the Chocolatey package manager, if installed.     |
+| Scoop                   | Fetch updates from the Scooop package manager, if installed.         |
+| Windows Package Manager | Fetch updates from the Windows Package Manager.                      |
+| Microsoft Store         | Fetch updates from the Microsoft Store.                              |
+| Windows Update          | Fetch Windows updates, excluding the the `drivers` updates category. |
 
 ### Virus Scans
 
 Performs virus scans with various antivirus utilities.
 
-| Option                          | Description |
-| ------------------------------- | ----------- |
-| Microsoft Safety Scanner        |             |
-| Malicious Software Removal Tool |             |
-| Kaspersky Virus Removal Tool    |             |
-| Malwarebytes ADWCleaner         |             |
+| Option                          | Description                                                                           |
+| ------------------------------- | ------------------------------------------------------------------------------------- |
+| Microsoft Safety Scanner        | Scan & remove medium-to-high threats with Microsoft Safety Scanner                    |
+| Malicious Software Removal Tool | Scan & remove medium-to-high threats with Microsoft's Malicious Software Removal Tool |
+| Kaspersky Virus Removal Tool    | Scan & remove medium-to-high threats with Kaspersky Virus Removal Tool                |
+| Malwarebytes ADWCleaner         | Scan & remove adware and other PUPs with Malwarebytes ADWCleaner                      |
 
 ### Optimize Disks
 
@@ -81,12 +81,12 @@ Further information can be found in the [Optimize-Volume Documentation](https://
 
 ### Advanced
 
-| Option            | Description |
-| ----------------- | ----------- |
-| Fix Hyper-V Perms |             |
-| Repair System     |             |
-| Disable Services  |             |
-| Clear iOS Cache   |             |
+| Option            | Description                                                      |
+| ----------------- | ---------------------------------------------------------------- |
+| Fix Hyper-V Perms | Reslove an issue cause by incorrect Hyper-V file permissions.    |
+| Repair System     | Perform Windows system repairs with dism, sfc, & chkdsk.         |
+| Disable Services  | Disable the Windows services 'DiagTrack', 'SysMain', & 'WSearch' |
+| Clear iOS Cache   | Delete data for iTunes & 3uTools to free up disk space.          |
 
 ## Parameters
 

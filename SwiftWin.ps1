@@ -278,7 +278,7 @@ function Get-Updates {
   #endregion
 
   #region Chocolatey
-  if ($UpdateSelection -eq "choco" -or $UpdateSelection -eq "all") {
+  if (Get-Command choco.exe -ErrorAction SilentlyContinue -and $UpdateSelection -eq "choco" -or $UpdateSelection -eq "all") {
     Show-Message -MessageType "info" -MessageText "Checking for Chocolatey..."
     if (Get-Command chocolatey.exe -ErrorAction SilentlyContinue) {
       $jobName = Wait-Animation { $(choco upgrade all -y) } "Chocolatey found, updating..."
@@ -292,7 +292,7 @@ function Get-Updates {
   #endregion
 
   #region Scoop
-  if ($UpdateSelection -eq "scoop" -or $UpdateSelection -eq "all") {
+  if (Get-Command scoop.exe -ErrorAction SilentlyContinue -and $UpdateSelection -eq "scoop" -or $UpdateSelection -eq "all") {
     Show-Message -MessageType "info" -MessageText "Checking for Scoop..."
     if (Get-Command scoop.ps1 -ErrorAction SilentlyContinue) {
       $jobName = Wait-Animation { $(scoop update '*') } "Scoop found, updating..."

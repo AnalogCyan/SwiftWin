@@ -145,12 +145,12 @@ function Assert-Security {
   }
 
   function Invoke-Msert {
-    Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri $Using:msert -OutFile $Using:PSScriptRoot\temp\MSERT.exe; Start-Process "$Using:PSScriptRoot\temp\MSERT.exe" -ArgumentList "/Q /F:Y /N" -Verb runAs -Wait) } "Running MSERT..."
+    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri $Using:msert -OutFile $Using:PSScriptRoot\temp\MSERT.exe; Start-Process "$Using:PSScriptRoot\temp\MSERT.exe" -ArgumentList "/Q /F:Y /N" -Verb runAs -Wait) } "Running MSERT..."
     Get-Content C:/Windows/debug/msert.log >> $logOutputPath/msert_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
 
   function Invoke-Msrt {
-    Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri $Using:msrt -OutFile $Using:PSScriptRoot\temp\MSRT.exe; Start-Process "$Using:PSScriptRoot\temp\MSRT.exe" -ArgumentList "/Q /F:Y /N" -Verb runAs -Wait) } "Running MSRT..."
+    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri $Using:msrt -OutFile $Using:PSScriptRoot\temp\MSRT.exe; Start-Process "$Using:PSScriptRoot\temp\MSRT.exe" -ArgumentList "/Q /F:Y /N" -Verb runAs -Wait) } "Running MSRT..."
     Get-Content C:/Windows/debug/mrt.log >> $logOutputPath/msrt_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
 

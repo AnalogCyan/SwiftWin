@@ -190,7 +190,9 @@ function Optimize-Disks {
   param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
+    [ValidateSet("cleanmgr", "sense", "wucache", "wspurge", "bbit", "defrag", "all")]
     [String]$cleanSelection
+    
   )
   #region Variables
   $StorageSense = {

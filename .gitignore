@@ -1,6 +1,7 @@
 logs/
 temp/
 SwiftWin.old.ps1
+test.ps1
 
 # General
 .DS_Store
@@ -8,7 +9,7 @@ SwiftWin.old.ps1
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
 
 # Thumbnails
 ._*

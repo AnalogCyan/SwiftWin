@@ -35,16 +35,8 @@ function Wait-Animation {
     [Console]::CursorVisible = $false
 
     $counter = 0
-    $frames = ' |', ' /', ' -', ' \'
-    $wrappedScriptBlock = {
-      try {
-        Invoke-Expression $args[0]
-      }
-      catch {
-        Write-Output "Error: $_"
-      }
-    }  
-    $jobName = Start-Job -ScriptBlock $wrappedScriptBlock -ArgumentList $scriptBlock.ToString()
+    $frames = '|', '/', '-', '\'
+    $jobName = Start-Job -ScriptBlock $scriptBlock
 
     while ($jobName.JobStateInfo.State -eq "Running") {
       $frame = $frames[$counter % $frames.Length]
@@ -64,12 +56,6 @@ function Wait-Animation {
     [Console]::CursorVisible = $true
   }
   Write-Host ""
-  # Retrieve and display the error message if any
-  $jobResult = Receive-Job -Job $jobName -Wait
-  if ($jobResult -match "Error:") {
-    Show-Message -MessageType "error" -MessageText "A command returned the following error:"
-    Write-Host -f Red $jobResult
-  }
   return $jobName
 }
 

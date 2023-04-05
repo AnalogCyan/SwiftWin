@@ -461,6 +461,32 @@ function Clear-iOSCache {
   Remove-Item -Force -Recurse "$env:APPDATA\Apple Computer\"
 }
 
+function Remove-SystemBloat {
+  $apps = @(
+    "Microsoft.549981C3F5F10"
+  )
+  #! Run this to get the list of apps to remove before running the script
+  #! to ensure unrealted apps are not erroneously removed.
+  #! Adjust the wildcard(s) if needed to refine package selection.
+  #! Substitute `*.HP*` to search for other packages.
+  #! Get-AppxPackage -AllUsers | Where-Object { $_.Name -like "*.HP*" } | Select-Object -Property Name, PackageFullName
+  Get-AppxPackage -AllUsers | Where-Object { $_.Name -like "*.HP*" } | ForEach-Object { $apps += $_.PackageFullName }
+  Get-AppxPackage -AllUsers | Where-Object { $_.Name -like "*.myHP*" } | ForEach-Object { $apps += $_.PackageFullName }
+  Get-AppxPackage -AllUsers | Where-Object { $_.Name -like "*.McAfee*" } | ForEach-Object { $apps += $_.PackageFullName }
+  Show-Message -NoNewline -MessageType "warn" -MessageText "This option will remove the following system bloatware: $apps Continue? [y/N] "
+  if ($(Read-Host) -NotContains "y") { exit }
+  ForEach ($app in $apps) {
+    Write-Output "Removing $app..."
+    try {
+      Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage
+      Write-Output "Removed app $app"
+    }
+    catch {
+      Write-Output "Failed to remove $app"
+    }
+  }
+}
+
 <#
 .SYNOPSIS
 Display a menu and get user selection.
@@ -587,7 +613,8 @@ function Show-Menu {
         '1' { Repair-HyperVPerms }
         '2' { Repair-System }
         '3' { Disable-Services }
-        '4' { Clear-iOSCache }
+        '4' { Remove-SystemBloat }
+        '5' { Clear-iOSCache }
       }
     }
     Default {

@@ -3,7 +3,6 @@
 # Param()
 
 #region Variables
-$ver = "v0.1"
 $logo = "
    _____         _ ______ _       ___
   / ___/      __(_) __/ /| |     / (_)___
@@ -11,7 +10,7 @@ $logo = "
  ___/ / |/ |/ / / __/ /_ | |/ |/ / / / / /
 /____/|__/|__/_/_/  \__/ |__/|__/_/_/ /_/
 
-  https://git.thayn.me/SwiftWin | $ver
+      https://git.thayn.me/SwiftWin
 
 "
 #endregion
@@ -29,11 +28,15 @@ function Wait-Animation {
     [string]$LogFilePath = "script_output_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
   )
 
+  # Wrap the contents of the script block in a try/catch block
+  $ScriptBlockString = "try { " + $ScriptBlock.ToString() + " } catch { Write-Host `"[ERROR]`" `$_.Exception.Message -ForegroundColor Red }"
+  $ScriptBlock = [scriptblock]::Create($ScriptBlockString)
+
   # Spinner animation characters
   $spinnerChars = '|', '/', '-', '\'
 
   # Start the script block in the background
-  $job = Start-Job -ScriptBlock $ScriptBlock
+  $job = Start-Job -ScriptBlock $ScriptBlock -ErrorVariable jobErrors
 
   # Display the spinner animation while the script block is running
   $i = 0
@@ -55,6 +58,14 @@ function Wait-Animation {
   # Log the script output to a file
   $output = Receive-Job -Job $job
   $output | Out-File -FilePath $LogFilePath
+
+  # Check for and report errors
+  if ($jobErrors) {
+    Write-Host "Errors:"
+    foreach ($error in $jobErrors) {
+      Write-Output $error
+    }
+  }
 
   # Clean up
   Remove-Job -Job $job

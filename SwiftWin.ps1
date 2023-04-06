@@ -3,7 +3,6 @@
 # Param()
 
 #region Variables
-$ver = "v0.1"
 $logo = "
    _____         _ ______ _       ___
   / ___/      __(_) __/ /| |     / (_)___
@@ -11,7 +10,7 @@ $logo = "
  ___/ / |/ |/ / / __/ /_ | |/ |/ / / / / /
 /____/|__/|__/_/_/  \__/ |__/|__/_/_/ /_/
 
-  https://git.thayn.me/SwiftWin | $ver
+      https://git.thayn.me/SwiftWin
 
 "
 #endregion

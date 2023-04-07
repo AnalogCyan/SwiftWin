@@ -36,7 +36,7 @@ function Wait-Animation {
   $spinnerChars = '|', '/', '-', '\'
 
   # Start the script block in the background
-  $job = Start-Job -ScriptBlock $ScriptBlock -ErrorVariable jobErrors
+  $job = Start-Job -ScriptBlock $ScriptBlock
 
   # Display the spinner animation while the script block is running
   $i = 0
@@ -58,14 +58,6 @@ function Wait-Animation {
   # Log the script output to a file
   $output = Receive-Job -Job $job
   $output | Out-File -FilePath $LogFilePath
-
-  # Check for and report errors
-  if ($jobErrors) {
-    Write-Host "Errors:"
-    foreach ($error in $jobErrors) {
-      Write-Output $error
-    }
-  }
 
   # Clean up
   Remove-Job -Job $job

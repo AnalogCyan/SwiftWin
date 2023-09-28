@@ -3,7 +3,6 @@
 # Param()
 
 #region Variables
-$ver = "v0.1"
 $logo = "
    _____         _ ______ _       ___
   / ___/      __(_) __/ /| |     / (_)___
@@ -11,52 +10,57 @@ $logo = "
  ___/ / |/ |/ / / __/ /_ | |/ |/ / / / / /
 /____/|__/|__/_/_/  \__/ |__/|__/_/_/ /_/
 
-  https://git.thayn.me/SwiftWin | $ver
+      https://git.thayn.me/SwiftWin
 
 "
 #endregion
 
 #region Functions
 function Wait-Animation {
-  [CmdletBinding()]
   param (
     [Parameter(Mandatory = $true)]
-    [System.Management.Automation.ScriptBlock]
-    $scriptBlock,
+    [System.Management.Automation.ScriptBlock]$ScriptBlock,
+
     [Parameter(Mandatory = $true)]
-    [string]
-    $message
+    [string]$DisplayText,
+
+    [Parameter(Mandatory = $false)]
+    [string]$LogFilePath = "script_output_$(Get-Date -Format 'yyyyMMdd_HHmmss').log"
   )
-  Write-Host -NoNewline -f Blue "[INFO] "
-  Write-Host -NoNewline $message
-  $cursorTop = [Console]::CursorTop
 
-  try {
-    [Console]::CursorVisible = $false
+  # Wrap the contents of the script block in a try/catch block
+  $ScriptBlockString = "try { " + $ScriptBlock.ToString() + " } catch { Write-Host `"[ERROR]`" `$_.Exception.Message -ForegroundColor Red }"
+  $ScriptBlock = [scriptblock]::Create($ScriptBlockString)
 
-    $counter = 0
-    $frames = '|', '/', '-', '\'
-    $jobName = Start-Job -ScriptBlock $scriptBlock
+  # Spinner animation characters
+  $spinnerChars = '|', '/', '-', '\'
 
-    while ($jobName.JobStateInfo.State -eq "Running") {
-      $frame = $frames[$counter % $frames.Length]
+  # Start the script block in the background
+  $job = Start-Job -ScriptBlock $ScriptBlock
 
-      Write-Host "$frame" -NoNewline
-      [Console]::SetCursorPosition($message.Length + 7, $cursorTop)
-
-      $counter++
-      Start-Sleep -Milliseconds 125
-    }
-
-    # Only needed if you use a multiline frames
-    Write-Host ($frames[0] -replace '[^\s+]', ' ')
+  # Display the spinner animation while the script block is running
+  $i = 0
+  while ($job.State -eq "Running") {
+    $spinnerChar = $spinnerChars[$i % $spinnerChars.Length]
+    Write-Host -NoNewline -ForegroundColor Blue "[INFO] "
+    Write-Host -NoNewline "$DisplayText $spinnerChar`r"
+    Start-Sleep -Milliseconds 200
+    $i++
   }
-  finally {
-    [Console]::SetCursorPosition(0, $cursorTop)
-    [Console]::CursorVisible = $true
-  }
-  Write-Host ""
-  return $jobName
+
+  # Clear the spinner animation line
+  Write-Host "`r" -NoNewline
+
+  # Display the completion message
+  Write-Host -NoNewline -ForegroundColor Blue "[INFO] "
+  Write-Host "$DisplayText Completed."
+
+  # Log the script output to a file
+  $output = Receive-Job -Job $job
+  $output | Out-File -FilePath $LogFilePath
+
+  # Clean up
+  Remove-Job -Job $job
 }
 
 function Show-Message {
@@ -101,13 +105,19 @@ function Invoke-Setup {
 }
 
 function Exit-Script {
-  $jobName = Wait-Animation { $(Get-ChildItem -Path $using:PSScriptRoot\temp\ -Include * -File -Recurse | foreach { $_.Delete() }; Remove-Item -Path $using:PSScriptRoot\temp\* -Recurse -Force -ErrorAction SilentlyContinue) } "Cleaning up temporary files..."
-  Receive-Job -Job $jobName >> ./logs/cleanup_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+  $scriptBlock = {
+    Get-ChildItem -Path $using:PSScriptRoot\temp\ -Include * -File -Recurse | ForEach-Object { $_.Delete() }
+    Remove-Item -Path $using:PSScriptRoot\temp\* -Recurse -Force -ErrorAction SilentlyContinue
+  }
+  Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Cleaning up temporary files..."
   exit
 }
 
 function Clear-Logs {
-  Wait-Animation { $($logs = Get-ChildItem -Path ./logs -File -Recurse; $logs | ForEach-Object { $_.Delete() }) } "Cleaning up log files..."
+  $scriptBlock = {
+    Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath 'logs') -File -Recurse | Remove-Item -Force -ErrorAction SilentlyContinue
+  }
+  Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Cleaning up log files..."
   Show-Menu "logs"
 }
 
@@ -145,23 +155,41 @@ function Assert-Security {
   }
 
   function Invoke-Msert {
-    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri $Using:msert -OutFile $Using:PSScriptRoot\temp\MSERT.exe; Start-Process "$Using:PSScriptRoot\temp\MSERT.exe" -ArgumentList "/Q /F:Y /N" -Verb runAs -Wait) } "Running MSERT..."
-    Get-Content C:/Windows/debug/msert.log >> $logOutputPath/msert_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    $scriptBlock = {
+      $progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri $Using:msert -OutFile $Using:PSScriptRoot\temp\MSERT.exe; Start-Process "$Using:PSScriptRoot\temp\MSERT.exe" -ArgumentList "/Q /F:Y /N" -Verb runAs -Wait
+    }
+    Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Running MSERT..."
+    Start-Sleep -Seconds 2
+    Get-Content $env:SystemRoot\debug\msert.log >> $logOutputPath/msert_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
 
   function Invoke-Msrt {
-    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri $Using:msrt -OutFile $Using:PSScriptRoot\temp\MSRT.exe; Start-Process "$Using:PSScriptRoot\temp\MSRT.exe" -ArgumentList "/Q /F:Y /N" -Verb runAs -Wait) } "Running MSRT..."
+    $scriptBlock = {
+      $progressPreference = 'silentlyContinue'
+      Invoke-WebRequest -Uri $Using:msrt -OutFile $Using:PSScriptRoot\temp\MSRT.exe
+      Start-Process "$Using:PSScriptRoot\temp\MSRT.exe" -ArgumentList "/Q /F:Y /N" -Verb runAs -Wait
+    }
+    Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Running MSRT..."
+    Start-Sleep -Seconds 2
     Get-Content C:/Windows/debug/mrt.log >> $logOutputPath/msrt_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
   }
 
   function Invoke-Kvrt {
-    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri 'https://devbuilds.s.kaspersky-labs.com/devbuilds/KVRT/latest/full/KVRT.exe' -OutFile $Using:PSScriptRoot\temp\KVRT.exe; Start-Process "$Using:PSScriptRoot\temp\KVRT.exe" -ArgumentList "-accepteula -processlevel 2 -noads -silent -adinsilent -allvolumes" -Verb runAs -Wait) } "Running KVRT..."
-    Receive-Job -Job $jobName >> $logOutputPath/kvrt_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    $scriptBlock = {
+      $progressPreference = 'silentlyContinue'
+      Invoke-WebRequest -Uri 'https://devbuilds.s.kaspersky-labs.com/devbuilds/KVRT/latest/full/KVRT.exe' -OutFile $Using:PSScriptRoot\temp\KVRT.exe
+      Start-Process "$Using:PSScriptRoot\temp\KVRT.exe" -ArgumentList "-accepteula -processlevel 2 -noads -silent -adinsilent -allvolumes" -Verb runAs -Wait
+    }
+    Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Running KVRT..."
   }
 
   function Invoke-Adw {
-    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri 'https://downloads.malwarebytes.com/file/adwcleaner' -OutFile $Using:PSScriptRoot\temp\ADWCleaner.exe; Start-Process "$Using:PSScriptRoot\temp\ADWCleaner.exe" -ArgumentList "/eula /clean /noreboot" -Verb runAs -Wait) } "Running ADWCleaner..."
-    Receive-Job -Job $jobName >> $logOutputPath/adw_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    $scriptBlock = {
+      $progressPreference = 'silentlyContinue'
+      Invoke-WebRequest -Uri 'https://downloads.malwarebytes.com/file/adwcleaner' -OutFile $Using:PSScriptRoot\temp\ADWCleaner.exe
+      Start-Process "$Using:PSScriptRoot\temp\ADWCleaner.exe" -ArgumentList "/eula /clean /noreboot" -Verb runAs -Wait
+    }
+    Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Running ADWCleaner..."
   }
 
   Show-Message -MessageType "warn" -MessageText "This option will automatically clean any perceived threats."
@@ -194,90 +222,106 @@ function Optimize-Disks {
     [String]$cleanSelection
     
   )
-  #region Variables
-  $StorageSense = {
-    ## Enable Storage Sense
-    ## Ensure the StorageSense key exists
-    $key = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense"
-    If (!(Test-Path "$key")) {
-      New-Item -Path "$key" | Out-Null
-    }
-    If (!(Test-Path "$key\Parameters")) {
-      New-Item -Path "$key\Parameters" | Out-Null
-    }
-    If (!(Test-Path "$key\Parameters\StoragePolicy")) {
-      New-Item -Path "$key\Parameters\StoragePolicy" | Out-Null
-    }
-
-    ## Set Storage Sense settings
-    ## Enable Storage Sense
-    Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "01" -Type DWord -Value 1
-
-    ## Set 'Run Storage Sense' to Every Week
-    Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "2048" -Type DWord -Value 7
-
-    ## Enable 'Delete temporary files that my apps aren't using'
-    Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "04" -Type DWord -Value 1
-
-    ## Set 'Delete files in my recycle bin if they have been there for over' to 30 days
-    Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "08" -Type DWord -Value 1
-    Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "256" -Type DWord -Value 30
-
-    ## Set 'Delete files in my Downloads folder if they have been there for over' to never
-    Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "32" -Type DWord -Value 0
-    Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "512" -Type DWord -Value 0
-
-    ## Set value that Storage Sense has already notified the user
-    Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "StoragePoliciesNotified" -Type DWord -Value 1
-  }
-  #endregion
-
-  #region Alerts & Confirmation
-  Show-Message -MessageType "notice" -MessageText "Disk cleanup will run in 'verylowdisk' mode and prompt you as if you are low on space."
-  Show-Message -MessageType "notice" -MessageText "This is only a result of 'verylowdisk' mode and does not reflect the actual status of your disks."
-  #endregion
 
   #region Disk Cleanup
   if ($cleanSelection -eq "cleanmgr" -or $cleanSelection -eq "all") {
-    $jobName = Wait-Animation { $(Start-Process "cleanmgr" -ArgumentList "/verylowdisk" -Verb runAs -Wait) } "Running Disk Cleanup..."
-    Receive-Job -Job $jobName >> ./logs/cleanmgr_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    Show-Message -MessageType "notice" -MessageText "Disk cleanup will run in 'verylowdisk' mode and prompt you as if you are low on space."
+    Show-Message -MessageType "notice" -MessageText "This is only a result of 'verylowdisk' mode and does not reflect the actual status of your disks."
+    $scriptBlock = {
+      Start-Process "cleanmgr" -ArgumentList "/verylowdisk" -Verb runAs -Wait
+    }
+    Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Running Disk Cleanup..."
   }
   #endregion
 
   #region Storage Sense
   if ($cleanSelection -eq "sense" -or $cleanSelection -eq "all") {
-    $jobName = Wait-Animation { $(Invoke-Expression $using:StorageSense) } "Enabling Storage Sense..."
-    Receive-Job -Job $jobName >> ./logs/cleanmgr_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
-    $jobName = Wait-Animation { $( Start-Process "cleanmgr" -ArgumentList "/autoclean" -Verb runAs -Wait ) } "Running Storage Sense..."
-    Receive-Job -Job $jobName >> ./logs/cleanmgr_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    $scriptBlock = {
+      $StorageSense = {
+        ## Enable Storage Sense
+        ## Ensure the StorageSense key exists
+        $key = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense"
+        If (!(Test-Path "$key")) {
+          New-Item -Path "$key" | Out-Null
+        }
+        If (!(Test-Path "$key\Parameters")) {
+          New-Item -Path "$key\Parameters" | Out-Null
+        }
+        If (!(Test-Path "$key\Parameters\StoragePolicy")) {
+          New-Item -Path "$key\Parameters\StoragePolicy" | Out-Null
+        }
+    
+        ## Set Storage Sense settings
+        ## Enable Storage Sense
+        Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "01" -Type DWord -Value 1
+    
+        ## Set 'Run Storage Sense' to Every Week
+        Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "2048" -Type DWord -Value 7
+    
+        ## Enable 'Delete temporary files that my apps aren't using'
+        Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "04" -Type DWord -Value 1
+    
+        ## Set 'Delete files in my recycle bin if they have been there for over' to 30 days
+        Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "08" -Type DWord -Value 1
+        Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "256" -Type DWord -Value 30
+    
+        ## Set 'Delete files in my Downloads folder if they have been there for over' to never
+        Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "32" -Type DWord -Value 0
+        Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "512" -Type DWord -Value 0
+    
+        ## Set value that Storage Sense has already notified the user
+        Set-ItemProperty -Path "$key\Parameters\StoragePolicy" -Name "StoragePoliciesNotified" -Type DWord -Value 1
+      }
+      & $StorageSense
+      Start-Process "cleanmgr" -ArgumentList "/autoclean" -Verb runAs -Wait
+    }
+    Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Enabling & Running Storage Sense..."
   }
   #endregion
 
   #region Clear Windows Update Cache
   if ($cleanSelection -eq "wucache" -or $cleanSelection -eq "all") {
-    $jobName = Wait-Animation { $(Stop-Service -DisplayName "Background Intelligent Transfer Service" -Force; Stop-Service -DisplayName "Windows Update" -Force; Get-ChildItem -ErrorAction Ignore -LiteralPath "C:\Windows\SoftwareDistribution\" -Recurse | Sort-Object { (--$script:i) } | Remove-Item -ErrorAction Ignore; Remove-Item -ErrorAction Ignore -LiteralPath "C:\Windows\SoftwareDistribution\" -Recurse -Force) } "Clearing Windows Update cache..."
-    Receive-Job -Job $jobName >> ./logs/wucache_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    $scriptBlock = {
+      Stop-Service -DisplayName "Background Intelligent Transfer Service" -Force
+      Stop-Service -DisplayName "Windows Update" -Force
+      Get-ChildItem -ErrorAction Ignore -LiteralPath "C:\Windows\SoftwareDistribution\" -Recurse | Sort-Object { (--$script:i) } | Remove-Item -ErrorAction Ignore
+      Remove-Item -ErrorAction Ignore -LiteralPath "C:\Windows\SoftwareDistribution\" -Recurse -Force
+    }
+    Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Clearing Windows Update Cache..."
   }
   #endregion
 
   #region Windows Search Purge & Reinitialize
   if ($cleanSelection -eq "wspurge" -or $cleanSelection -eq "all") {
-    $jobName = Wait-Animation { $(cmd.exe /c "net stop WSearch"; cmd.exe /c "if exist 'C:\ProgramData\Microsoft\Search\' RD /S /Q 'C:\ProgramData\Microsoft\Search'"; Remove-Item -ErrorAction Ignore -Path 'HKCU:\Software\Microsoft\Windows Search' -Recurse -Force; Remove-ItemProperty -ErrorAction Ignore -Path 'HKLM:\Software\Microsoft\Windows Search' -Name 'SetupCompletedSuccessfully' -Force) } "Cleaning & Reinitializing Windows Search..."
-    Receive-Job -Job $jobName >> ./logs/wspurge_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    $scriptBlock = {
+      cmd.exe /c "net stop WSearch"
+      cmd.exe /c "if exist 'C:\ProgramData\Microsoft\Search\' RD /S /Q 'C:\ProgramData\Microsoft\Search'"
+      Remove-Item -ErrorAction Ignore -Path 'HKCU:\Software\Microsoft\Windows Search' -Recurse -Force
+      Remove-ItemProperty -ErrorAction Ignore -Path 'HKLM:\Software\Microsoft\Windows Search' -Name 'SetupCompletedSuccessfully' -Force
+    }
+    Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Purging & Reinitializing Windows Search..."
   }
   #endregion
 
   #region BleachBit
   if ($cleanSelection -eq "bbit" -or $cleanSelection -eq "all") {
-    $jobName = Wait-Animation { $($progressPreference = 'silentlyContinue'; Invoke-WebRequest -Uri https://download.bleachbit.org/BleachBit-4.2.0-portable.zip -OutFile $Using:PSScriptRoot\temp\BleachBit-4.2.0-portable.zip; Expand-Archive -LiteralPath $Using:PSScriptRoot\temp\BleachBit-4.2.0-portable.zip -DestinationPath $Using:PSScriptRoot\temp; Start-Process "$Using:PSScriptRoot\temp\BleachBit-Portable\bleachbit_console.exe" -ArgumentList "--update-winapp2" -Verb runAs -Wait; Start-Process "$Using:PSScriptRoot\temp\BleachBit-Portable\bleachbit_console.exe" -ArgumentList "--clean flash.* internet_explorer.* system.logs system.memory_dump system.recycle_bin system.tmp" -Wait) } "Running BleachBit..."
-    Receive-Job -Job $jobName >> ./logs/bbit_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    $scriptBlock = {
+      $progressPreference = 'silentlyContinue'
+      Invoke-WebRequest -Uri https://download.bleachbit.org/BleachBit-4.2.0-portable.zip -OutFile $Using:PSScriptRoot\temp\BleachBit-4.2.0-portable.zip
+      Expand-Archive -LiteralPath $Using:PSScriptRoot\temp\BleachBit-4.2.0-portable.zip -DestinationPath $Using:PSScriptRoot\temp
+      Start-Process "$Using:PSScriptRoot\temp\BleachBit-Portable\bleachbit_console.exe" -ArgumentList "--update-winapp2" -Verb runAs -Wait
+      Start-Process "$Using:PSScriptRoot\temp\BleachBit-Portable\bleachbit_console.exe" -ArgumentList "--clean flash.* internet_explorer.* system.logs system.memory_dump system.recycle_bin system.tmp" -Wait
+    }
+    Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Running BleachBit..."
   }
   #endregion
 
   #region Optimize-Volume
   if ($cleanSelection -eq "defrag" -or $cleanSelection -eq "all") {
-    $jobName = Wait-Animation { $(foreach ($item in $((Get-Volume).DriveLetter.Where({ $null -ne $_ }))) { Optimize-Volume -DriveLetter $item }) } "Optimizing Disks..."
-    Receive-Job -Job $jobName >> ./logs/optimize_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    $scriptBlock = {
+      foreach ($item in $((Get-Volume).DriveLetter.Where({ $null -ne $_ }))) { Optimize-Volume -DriveLetter $item }
+    }
+    Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Optimizing Volumes..."
   }
   #endregion
 }
@@ -297,29 +341,25 @@ function Get-Updates {
   #endregion
 
   #region Chocolatey
-  if (Get-Command choco.exe -ErrorAction SilentlyContinue -and $UpdateSelection -eq "choco" -or $UpdateSelection -eq "all") {
+  if ($UpdateSelection -eq "choco" -or $UpdateSelection -eq "all") {
     Show-Message -MessageType "info" -MessageText "Checking for Chocolatey..."
     if (Get-Command chocolatey.exe -ErrorAction SilentlyContinue) {
-      $jobName = Wait-Animation { $(choco upgrade all -y) } "Chocolatey found, updating..."
-      Receive-Job -Job $jobName >> ./logs/choco_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
-    }
-    else {
-      $jobName = Wait-Animation { $(Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))) } "Chocolatey not found, installing..."
-      Receive-Job -Job $jobName >> ./logs/choco_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+      $scriptBlock = {
+        choco upgrade all -y
+      }
+      Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Chocolatey found, updating..."
     }
   }
   #endregion
 
   #region Scoop
-  if (Get-Command scoop.exe -ErrorAction SilentlyContinue -and $UpdateSelection -eq "scoop" -or $UpdateSelection -eq "all") {
+  if ($UpdateSelection -eq "scoop" -or $UpdateSelection -eq "all") {
     Show-Message -MessageType "info" -MessageText "Checking for Scoop..."
     if (Get-Command scoop.ps1 -ErrorAction SilentlyContinue) {
-      $jobName = Wait-Animation { $(scoop update '*') } "Scoop found, updating..."
-      Receive-Job -Job $jobName >> ./logs/scoop_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
-    }
-    else {
-      $jobName = Wait-Animation { $(Set-ExecutionPolicy RemoteSigned -Scope CurrentUser; iex "& {$(irm get.scoop.sh)} -RunAsAdmin"; scoop install aria2) } "Scoop not found, installing..."
-      Receive-Job -Job $jobName >> ./logs/scoop_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+      $scriptBlock = {
+        scoop update '*'
+      }
+      Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Scoop found, updating..."
     }
   }
   #endregion
@@ -339,16 +379,21 @@ function Get-Updates {
 
   #region Microsoft Store
   if ($UpdateSelection -eq "msstore" -or $UpdateSelection -eq "all") {
-    $jobName = Wait-Animation { $(Get-CimInstance -Namespace "Root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName UpdateScanMethod) } "Checking for Microsoft Store updates..."
-    Receive-Job -Job $jobName >> ./logs/msstore_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    $scriptBlock = {
+      Get-CimInstance -Namespace "Root\cimv2\mdm\dmmap" -ClassName "MDM_EnterpriseModernAppManagement_AppManagement01" | Invoke-CimMethod -MethodName UpdateScanMethod
+    }
+    Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Checking for Microsoft Store updates..."
   }
   #endregion
 
   #region Windows Update
   if ($UpdateSelection -eq "win-update" -or $UpdateSelection -eq "all") {
     Show-Message -MessageType "notice" -MessageText "Ignoring driver updates to avoid installing incorrect drivers..."
-    $jobName = Wait-Animation { $(if (-not(Get-Command PSWindowsUpdate -ErrorAction SilentlyContinue)) { Install-Module -ErrorAction SilentlyContinue -Name PSWindowsUpdate -Force }; Import-Module PSWindowsUpdate; Install-WindowsUpdate -AcceptAll -IgnoreReboot -MicrosoftUpdate -NotCategory "Drivers" -RecurseCycle 2) } "Checking for Windows Updates..."
-    Receive-Job -Job $jobName >> ./logs/winupdate_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+    $scriptBlock = {
+      if (-not(Get-Command PSWindowsUpdate -ErrorAction SilentlyContinue)) { Install-Module -ErrorAction SilentlyContinue -Name PSWindowsUpdate -Force }
+      Import-Module PSWindowsUpdate; Install-WindowsUpdate -AcceptAll -IgnoreReboot -MicrosoftUpdate -NotCategory "Drivers" -RecurseCycle 2
+    }
+    Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Checking for Windows Updates..."
   }
   #endregion
 
@@ -422,14 +467,20 @@ function Repair-System {
   Show-Message -NoNewline -MessageType "warn" -MessageText "This option will check the system for corruption, and attempt repairs if any is found. Continue? [y/N] "
   if ($(Read-Host) -NotContains "y") { exit }
 
-  $jobName = Wait-Animation { $(dism /Online /Cleanup-Image /RestoreHealth) } "Running 'dism /Online /Cleanup-Image /RestoreHealth'..."
-  Receive-Job -Job $jobName >> ./logs/dism_restorehealth_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+  $scriptBlock = {
+    dism /Online /Cleanup-Image /RestoreHealth
+  }
+  Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Running 'dism /Online /Cleanup-Image /RestoreHealth'..."
 
-  $jobName = Wait-Animation { $(dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase) } "Running 'dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase'..."
-  Receive-Job -Job $jobName >> ./logs/dism_cleanup_reset_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+  $scriptBlock = {
+    dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase
+  }
+  Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Running 'dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase'..."
 
-  $jobName = Wait-Animation { $(sfc /SCANNOW) } "Running 'sfc /SCANNOW'..."
-  Receive-Job -Job $jobName >> ./logs/sfc_$(Get-Date -f yyyy-MM-dd)_$(Get-Date -f HH-mm-ss).log
+  $scriptBlock = {
+    sfc /SCANNOW
+  }
+  Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Running 'sfc /SCANNOW'..."
 
   Show-Message -NoNewline -MessageType "notice" -MessageText "Would you like to also run chkdsk? This operation may take a very long time. [y/N] "
   if ($(Read-Host) -Contains "y") { chkdsk /F /R }

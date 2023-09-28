@@ -525,7 +525,7 @@ function Remove-SystemBloat {
   Get-AppxPackage -AllUsers | Where-Object { $_.Name -like "*.myHP*" } | ForEach-Object { $apps += $_.PackageFullName }
   Get-AppxPackage -AllUsers | Where-Object { $_.Name -like "*.McAfee*" } | ForEach-Object { $apps += $_.PackageFullName }
   Show-Message -MessageType "warn" -MessageText "This option is currently considered a beta feature, and is not fully tested. It is intended for advanced users who understand the potential risks and implications."
-  Show-Message -NoNewline -MessageType "warn" -MessageText "This option will remove the following system bloatware: $apps Continue? [y/N] "
+  Show-Message -NoNewline -MessageType "warn" -MessageText "This option will remove the following system packages: $apps Continue? [y/N] "
   if ($(Read-Host) -NotContains "y") { exit }
   ForEach ($app in $apps) {
     Write-Output "Removing $app..."

@@ -284,7 +284,7 @@ function Optimize-Disks {
     $scriptBlock = {
       Stop-Service -DisplayName "Background Intelligent Transfer Service" -Force
       Stop-Service -DisplayName "Windows Update" -Force
-      Get-ChildItem -ErrorAction Ignore -LiteralPath "C:\Windows\SoftwareDistribution\" -Recurse | Sort-Object { (--$script:i) } | Remove-Item -ErrorAction Ignore
+      Get-ChildItem -ErrorAction Ignore -LiteralPath "C:\Windows\SoftwareDistribution\" -Recurse | Sort-Object { (--$script:i) } | Remove-Item -Recurse -ErrorAction Ignore
       Remove-Item -ErrorAction Ignore -LiteralPath "C:\Windows\SoftwareDistribution\" -Recurse -Force
     }
     Wait-Animation -ScriptBlock $scriptBlock -DisplayText "Clearing Windows Update Cache..."
